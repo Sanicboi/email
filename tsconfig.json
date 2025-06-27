@@ -15,5 +15,10 @@
       "strict": true,
       "strictPropertyInitialization": false,
       "allowJs": true
-   }
+   },
+   "ts-node": {
+    "compilerOptions": {
+      "module": "commonjs"
+    }
+  },
 }
