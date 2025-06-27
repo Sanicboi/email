@@ -17,7 +17,7 @@ const firstMessage = `
 let thread: AgentInputItem[] = [];
 
 
-AppDataSource.initialize().then(async () => {
+// AppDataSource.initialize().then(async () => {
     const bot = new TelegramBot(process.env.TG_TOKEN!, {
         polling: true
     });
@@ -60,5 +60,5 @@ AppDataSource.initialize().then(async () => {
         thread = result.history;
         await bot.sendMessage(msg.from!.id, result.finalOutput!);
     })
-});
+// });
 
