@@ -83,7 +83,7 @@ bot.onText(/./, async (msg) => {
     thread = result.history;
     await bot.sendMessage(msg.from!.id, result.finalOutput!);
   } else {
-    fs.writeFileSync(path.join(process.cwd(), `${waiter}.txt`), msg.text!, 'utf-8');
+    fs.writeFileSync(path.join(process.cwd(), 'data', `${waiter}.txt`), msg.text!, 'utf-8');
     waiter = 'none';
     thread = [];
     await bot.sendMessage(msg.from!.id, 'Изменил данные и сбросил диалог');
