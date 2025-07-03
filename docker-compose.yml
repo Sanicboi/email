@@ -1,5 +1,4 @@
 services:
-
   # postgres:
   #   image: "postgres:17.2"
   #   ports:
@@ -14,6 +13,3 @@ services:
     restart: always
     volumes:
       - ~/aidata:/app/data:rw
-
-  
-

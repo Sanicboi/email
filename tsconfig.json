@@ -1,24 +1,22 @@
 {
-   "compilerOptions": {
-      "lib": [
-         "es2021"
-      ],
-      "target": "es2021",
-      "module": "commonjs",
-      "moduleResolution": "node",
-      "outDir": "./build",
-      "emitDecoratorMetadata": true,
-      "experimentalDecorators": true,
-      "sourceMap": true,
-      "esModuleInterop": true,
-      "allowSyntheticDefaultImports": true,
-      "strict": true,
-      "strictPropertyInitialization": false,
-      "allowJs": true
-   },
-   "ts-node": {
+  "compilerOptions": {
+    "lib": ["es2021"],
+    "target": "es2021",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "outDir": "./build",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "sourceMap": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "strictPropertyInitialization": false,
+    "allowJs": true
+  },
+  "ts-node": {
     "compilerOptions": {
       "module": "commonjs"
     }
-  },
+  }
 }

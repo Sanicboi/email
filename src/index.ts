@@ -1,68 +1,16 @@
-import { AppDataSource } from "./data-source";
-import { Agent, AgentInputItem, run } from "@openai/agents";
 import "dotenv/config";
 import TelegramBot from "node-telegram-bot-api";
-import fs, { read, write } from "fs";
+import { AppState, Waiter } from "./state";
 import path from "path";
-import { z } from "zod";
 import axios, { AxiosResponse } from "axios";
+import { determineType } from "./determiner";
+import { replyToMessage } from "./writer";
+import { evaluateResponse } from "./evaluator";
 
-/**
- * AI configuration object
- */
-interface IConfig {
-  /**
-   * The path to knowledge base
-   */
-  kb: string;
-  /**
-   * The prompt
-   */
-  prompt: string;
-  /**
-   * The model
-   */
-  model: string;
-  /**
-   * The first message
-   */
-  firstMessage: string;
-}
-
-
-
-let thread: AgentInputItem[] = [];
-let waiter: "none" | keyof IConfig = "none";
-let config: IConfig = JSON.parse(
-  fs.readFileSync(path.join(process.cwd(), "ai.config.json"), "utf-8")
-);
-
-const readKB = (): string => {
-  if (!config.kb) throw new Error("No kb!");
-  return fs.readFileSync(
-    path.join(process.cwd(), "data", config.kb),
-    "utf-8"
-  )
-}
-
-const getWriterInstructions = (): string => {
-  let result: string = `${config.prompt}`
-  if (config.kb) result += `${config.prompt}\n\n\nБаза знаний:${readKB()}`;
-  return result;
-};
-
-const getValidatorInstructions = (): string => {
-  let result: string = `Ты - менеджер по продажам. Тебе будет дана цепочка писем. Убедись, что последнее сообщение соответствует требованиям, указанным в Базе знаний. В ответе укажи соответсвует ли оно и дай комментарий (почему)`;
-  if (config.kb) result += `${config.prompt}\n\n\nБаза знаний:${readKB()}`;
-  return result;
-}
-
-const getDeterminerInstructions = (): string => {
-  return `Ты - менеджер по продажам. Тебе будет дана цепочка писем. Определи, нужно ли отвечать на последнее электронное письмо, и объясни, почему. В ответе укажи результат определения (answer) и комментарий (comment)`
-}
 const bot = new TelegramBot(process.env.TG_TOKEN!, {
   polling: true,
 });
+const state = new AppState();
 
 bot.setMyCommands([
   {
@@ -74,156 +22,147 @@ bot.setMyCommands([
     description: "Информация",
   },
   {
-    command: "prompt",
-    description: "Изменить промпт",
-  },
-  {
-    command: "kb",
-    description: "Изменить Базу знаний (текстовый файл)",
-  },
-  {
-    command: "model",
-    description: "Изменить модель",
-  },
-  {
-    command: "first",
-    description: "Изменить первое сообщение",
-  },
-  {
-    command: "info",
-    description: "Информация",
+    command: "settings",
+    description: "Настройки",
   },
 ]);
 
-const writer = new Agent({
-  name: "МОП",
-  model: config.model,
-  instructions: getWriterInstructions,
-});
-
-const validator = new Agent({
-  name: "Валидатор",
-  model: config.model,
-  instructions: getValidatorInstructions,
-  outputType: z.object({
-    ok: z.boolean(),
-    comment: z.string(),
-  }),
-});
-
-const determiner = new Agent({
-  name: "Определитель",
-  model: config.model,
-  instructions: getDeterminerInstructions,
-  outputType: z.object({
-    answer: z.boolean(),
-    comment: z.string(),
-  }),
+bot.onText(/\/start/, async (msg) => {
+  state.waiter = null;
+  state.resId = null;
+  bot.sendMessage(msg.chat.id, state.firstMsg);
 });
 
 bot.onText(/\/info/, async (msg) => {
-  await bot.sendMessage(
-    msg.chat.id,
-    "Демо версия рассыльщика. Определитель работает полностью, валидатор не мешает не отправлять сообщение. БЗ на данный момент исключительно в формате .txt (поскольку сейчас она подгружается в диалог как сообщение, а не векторно, т.к. нет возможности прочитать доки библиотеки агентов опенаи, ), изменю в след версии на пдф"
-  );
+  bot.sendMessage(msg.chat.id, "");
 });
 
-bot.onText(/\/start/, async (msg) => {
-  thread = [];
-  waiter = "none";
-  await bot.sendMessage(msg.chat.id, config.firstMessage);
+bot.onText(/\/settings/, async (msg) => {
+  bot.sendMessage(msg.chat.id, "Найстройки", {
+    reply_markup: {
+      inline_keyboard: [
+        [
+          {
+            text: "База знаний",
+            callback_data: "set-kb",
+          },
+        ],
+        [
+          {
+            text: "Промпт",
+            callback_data: "set-prompt",
+          },
+        ],
+        [
+          {
+            text: "Первое сообщение",
+            callback_data: "set-first",
+          },
+        ],
+      ],
+    },
+  });
+});
+
+bot.on("callback_query", async (q) => {
+  if (q.data?.startsWith("set-")) {
+    const waiter = q.data.split("-")[1] as Waiter;
+    state.waiter = waiter;
+    bot.sendMessage(q.from.id, "Пришлите мне новое значение файлом");
+  }
+});
+
+bot.on("document", async (msg) => {
+  if (!msg.document) return;
+  if (!state.waiter) return;
+
+  const url = await bot.getFileLink(msg.document.file_id);
+  const res: AxiosResponse<Buffer> = await axios.get(url, {
+    responseType: "arraybuffer",
+  });
+  if (state.waiter !== "kb") {
+    const extName = path.extname(url);
+    if (extName !== ".txt") {
+      bot.sendMessage(
+        msg.chat.id,
+        "Файл для данной настройки должен быть .txt",
+      );
+      return;
+    }
+    const val: string = res.data.toString("utf-8");
+    switch (state.waiter) {
+      case "first":
+        state.firstMsg = val;
+        break;
+      default:
+        state.prompt = val;
+        break;
+    }
+  } else {
+    await state.setKb(path.basename(url), res.data);
+  }
+
+  state.resId = null;
+  state.waiter = null;
+  bot.sendMessage(msg.chat.id, "Найстройка изменена");
 });
 
 bot.onText(/./, async (msg) => {
-  if (msg.text?.startsWith("/")) return;
-  if (waiter === "none") {
-    if (thread.length === 0) {
-      thread.push({
-        status: "completed",
-        role: "assistant",
-        content: [
-          {
-            type: "output_text",
-            text: config.firstMessage,
-          },
-        ],
-      });
-    }
+  if (!msg.text) return;
+  if (msg.text.startsWith("/")) return;
+  if (state.waiter) return;
 
-    thread.push({
-      role: "user",
-      content: [
-        {
-          type: "input_text",
-          text: msg.text!,
-        },
-      ],
-    });
-
-    await bot.sendMessage(msg.chat.id, 'Запускаю определителя...');
-    const determinationResult = await run(determiner, thread);
-    await bot.sendMessage(msg.chat.id, `Результат определителя: ${determinationResult.finalOutput?.answer}\nКомментарий:${determinationResult.finalOutput?.comment}`);
-    if (!determinationResult.finalOutput?.answer) return;
-    await bot.sendMessage(msg.chat.id, 'Запускаю писателя')
-    
-    const result = await run(writer, thread);
-    thread = result.history;
-    await bot.sendMessage(msg.from!.id, result.finalOutput!);
-
-    await bot.sendMessage(msg.chat.id, 'Запускаю валидатора...');
-    const validation = await run(validator, thread);
-    await bot.sendMessage(msg.chat.id, `Результат определителя: ${validation.finalOutput?.ok}\nКомментарий:${validation.finalOutput?.comment}`);
-
-  } else if (waiter != 'kb') {
-    config[waiter] = msg.text!;
-    fs.writeFileSync(path.join(process.cwd(), 'ai.config.json'), JSON.stringify(config), 'utf-8');
-    waiter = "none";
-    thread = [];
-    await bot.sendMessage(msg.from!.id, "Изменил данные и сбросил диалог");
+  {
+    await bot.sendMessage(msg.chat.id, "Запускаю определителя...");
+    const res = await determineType(state.resId, state.kbId, msg.text);
+    await bot.sendMessage(
+      msg.chat.id,
+      `Результат определения:\nВажность:${res.importance}/10\nДействие:${res.type}`,
+    );
+    if (res.type !== "reply") return;
   }
-});
+  await bot.sendMessage(msg.chat.id, "Генерирую ответ...");
+  let generation = await replyToMessage(
+    state.resId,
+    state.kbId,
+    msg.text,
+    state.prompt,
+  );
+  await bot.sendMessage(msg.chat.id, generation.text);
 
-bot.onText(/\/prompt/, async (msg) => {
-  waiter = "prompt";
-  await bot.sendMessage(msg.chat.id, "Пришлите мне новый системный промпт");
-});
-
-bot.onText(/\/kb/, async (msg) => {
-  waiter = "kb";
-  await bot.sendMessage(msg.chat.id, "Пришлите мне новую базу знаний (файлом .txt)");
-});
-
-bot.onText(/\/model/, async (msg) => {
-  waiter = "model";
+  await bot.sendMessage(msg.chat.id, "Запускаю оценку...");
+  let evaluation = await evaluateResponse(generation.id, state.kbId);
   await bot.sendMessage(
     msg.chat.id,
-    "Пришлите мне новую модель (в формате OpenAI для кода, примеры: gpt-4o\ngpt-4.1-nano\ngpt-4o-mini\ngpt-4.1\ngpt-4-turbo\nИ др.)"
+    `Оценка:${evaluation.rating}\nКомментарий:${evaluation.comment}`,
   );
-});
 
-bot.onText(/\/first/, async (msg) => {
-  waiter = "firstMessage";
-  await bot.sendMessage(msg.chat.id, "Пришлите мне новое первое сообщение");
-});
+  let count = 1;
 
-bot.on('document', async (msg) => {
-  if (!msg.document) return;
-  if (waiter !== 'kb') return;
-  const url = await bot.getFileLink(msg.document.file_id);
-  if (path.extname(url) !== '.txt') {
-    await bot.sendMessage(msg.chat.id, 'Пришлите файл .txt!');
-    return;
+  while (count < 3 && evaluation.rating <= 3) {
+    await bot.sendMessage(
+      msg.chat.id,
+      "Оценка ниже 3х. Переделываю и переоцениваю...",
+    );
+    generation = await replyToMessage(
+      generation.id,
+      state.kbId,
+      `Подкорректируй свой ответ, вот комментарий: ${evaluation.comment}`,
+      state.prompt,
+      true,
+    );
+    await bot.sendMessage(msg.chat.id, generation.text);
+    evaluation = await evaluateResponse(generation.id, state.kbId);
+    await bot.sendMessage(
+      msg.chat.id,
+      `Оценка:${evaluation.rating}\nКомментарий:${evaluation.comment}`,
+    );
+    count++;
   }
-  const {data}: AxiosResponse<Buffer> = await axios.get(url, {
-    responseType: 'arraybuffer'
-  });
 
-  fs.writeFileSync(
-    path.join(process.cwd(), 'data', config.kb),
-    data,
-    'utf-8'
-  );
-  waiter = 'none';
-  thread = [];
-  await bot.sendMessage(msg.chat.id, 'База данных изменена и диалог сброшен');
-})
+  if (count === 3) {
+    await bot.sendMessage(msg.chat.id, "Оценка не пройдена!");
+  }
+
+  state.resId = generation.id;
+});
