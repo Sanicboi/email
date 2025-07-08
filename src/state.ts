@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 import { openai } from "./openai";
 
-export type Waiter = "kb" | "first" | "prompt" | null;
+export type Waiter = "kb" | "first" | "prompt" | 'email' | null;
 
 export class AppState {
   private _prompt: string;
@@ -10,6 +10,7 @@ export class AppState {
   private _firstMsg: string;
   private _resId: string | null = null;
   private _waiter: Waiter = null;
+  private _email: string | null = null;
 
   constructor() {
     const config: {
@@ -83,5 +84,13 @@ export class AppState {
 
   public set waiter(value: Waiter) {
     this._waiter = value;
+  }
+
+  public get email(): string | null {
+    return this._email;
+  }
+
+  public set email(value: string | null) {
+    this._email = value;
   }
 }

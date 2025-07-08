@@ -6,11 +6,63 @@ import axios, { AxiosResponse } from "axios";
 import { determineType } from "./determiner";
 import { replyToMessage } from "./writer";
 import { evaluateResponse } from "./evaluator";
+import mailer from "nodemailer";
+import { ImapFlow, ImapFlowOptions } from "imapflow";
+import { respond, sendFirst } from "./ai";
 
 const bot = new TelegramBot(process.env.TG_TOKEN!, {
   polling: true,
 });
 const state = new AppState();
+
+const poll = async () => {
+  const config: ImapFlowOptions = {
+    host: "imap.yandex.ru",
+    port: 993,
+    secure: true,
+    auth: {
+      user: "adamarttech@yandex.ru",
+      pass: process.env.YANDEX_PASS,
+    },
+  };
+  const client = new ImapFlow(config);
+
+  try {
+    await client.connect();
+
+    let lock = await client.getMailboxLock("INBOX");
+    try {
+      const searchCriteria = ["UNSEEN"];
+      const messageUids = await client.search({
+        seen: false,
+      });
+
+      if (!messageUids) {
+        console.log("no messages");
+      } else {
+        for await (let message of client.fetch(messageUids, {
+          envelope: true,
+          source: true,
+        })) {
+          if (message.envelope?.from) {
+            if (message.envelope.from[0].address === state.email) {
+              await respond(message.source!.toString(), state);
+            }
+          }
+
+          await client.messageFlagsAdd(message, ["\\Seen"]);
+        }
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      lock.release();
+      await client.logout();
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
 
 bot.setMyCommands([
   {
@@ -37,6 +89,10 @@ bot.onText(/\/info/, async (msg) => {
   bot.sendMessage(msg.chat.id, "");
 });
 
+bot.onText(/\/mail/, async (msg) => {
+  await sendFirst(state);
+})
+
 bot.onText(/\/settings/, async (msg) => {
   bot.sendMessage(msg.chat.id, "Найстройки", {
     reply_markup: {
@@ -59,6 +115,12 @@ bot.onText(/\/settings/, async (msg) => {
             callback_data: "set-first",
           },
         ],
+        [
+          {
+            text: 'Имейл для отправки',
+            callback_data: 'set-email'
+          }
+        ]
       ],
     },
   });
@@ -85,7 +147,7 @@ bot.on("document", async (msg) => {
     if (extName !== ".txt") {
       bot.sendMessage(
         msg.chat.id,
-        "Файл для данной настройки должен быть .txt",
+        "Файл для данной настройки должен быть .txt"
       );
       return;
     }
@@ -109,60 +171,11 @@ bot.on("document", async (msg) => {
 
 bot.onText(/./, async (msg) => {
   if (!msg.text) return;
-  if (msg.text.startsWith("/")) return;
-  if (state.waiter) return;
+  if (state.waiter != 'email') return;
+  state.email = msg.text;
+  state.waiter = null;
 
-  {
-    await bot.sendMessage(msg.chat.id, "Запускаю определителя...");
-    const res = await determineType(state.resId, state.kbId, msg.text);
-    await bot.sendMessage(
-      msg.chat.id,
-      `Результат определения:\nВажность:${res.importance}/10\nДействие:${res.type}`,
-    );
-    if (res.type !== "reply") return;
-  }
-  await bot.sendMessage(msg.chat.id, "Генерирую ответ...");
-  let generation = await replyToMessage(
-    state.resId,
-    state.kbId,
-    msg.text,
-    state.prompt,
-  );
-  await bot.sendMessage(msg.chat.id, generation.text);
+  await bot.sendMessage(msg.from!.id, 'Имейл изменен');
+})
 
-  await bot.sendMessage(msg.chat.id, "Запускаю оценку...");
-  let evaluation = await evaluateResponse(generation.id, state.kbId);
-  await bot.sendMessage(
-    msg.chat.id,
-    `Оценка:${evaluation.rating}\nКомментарий:${evaluation.comment}`,
-  );
-
-  let count = 1;
-
-  while (count < 3 && evaluation.rating <= 3) {
-    await bot.sendMessage(
-      msg.chat.id,
-      "Оценка ниже 3х. Переделываю и переоцениваю...",
-    );
-    generation = await replyToMessage(
-      generation.id,
-      state.kbId,
-      `Подкорректируй свой ответ, вот комментарий: ${evaluation.comment}`,
-      state.prompt,
-      true,
-    );
-    await bot.sendMessage(msg.chat.id, generation.text);
-    evaluation = await evaluateResponse(generation.id, state.kbId);
-    await bot.sendMessage(
-      msg.chat.id,
-      `Оценка:${evaluation.rating}\nКомментарий:${evaluation.comment}`,
-    );
-    count++;
-  }
-
-  if (count === 3) {
-    await bot.sendMessage(msg.chat.id, "Оценка не пройдена!");
-  }
-
-  state.resId = generation.id;
-});
+setInterval(poll, 10000);
