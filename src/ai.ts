@@ -53,6 +53,7 @@ export const respond = async (text: string, state: AppState) => {
 
 
 export const sendFirst = (state: AppState) => {
+    console.log(state.email);
     transporter.sendMail({
         to: state.email!,
         subject: 'Mailing test',
