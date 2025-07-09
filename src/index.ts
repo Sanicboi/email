@@ -77,6 +77,10 @@ bot.setMyCommands([
     command: "settings",
     description: "Настройки",
   },
+  {
+    command: 'mail',
+    description: 'Запустить рассылку'
+  }
 ]);
 
 bot.onText(/\/start/, async (msg) => {
