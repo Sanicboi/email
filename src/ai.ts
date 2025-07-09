@@ -58,6 +58,7 @@ export const sendFirst = (state: AppState) => {
     transporter.sendMail({
         to: state.email!,
         subject: 'Mailing test',
+        from: 'adamarttech@yandex.ru',
         text: state.firstMsg,
     }, (err, info) => {
         if (err) {
