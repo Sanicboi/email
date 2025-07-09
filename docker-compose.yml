@@ -12,4 +12,4 @@ services:
     env_file: .env
     restart: always
     volumes:
-      - ~/aidata/ai.config.json:/app/ai.config.json:rw
+      - ~/aidata:/app/data:rw

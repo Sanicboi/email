@@ -18,7 +18,7 @@ export class AppState {
       kbId: string;
       firstMsg: string;
     } = JSON.parse(
-      fs.readFileSync(path.join(process.cwd(), "ai.config.json"), "utf-8"),
+      fs.readFileSync(path.join(process.cwd(), 'data', "ai.config.json"), "utf-8"),
     );
 
     this._prompt = config.prompt;
@@ -28,7 +28,7 @@ export class AppState {
 
   private saveConfig(): void {
     fs.writeFileSync(
-      path.join(process.cwd(), "ai.config.json"),
+      path.join(process.cwd(), 'data', "ai.config.json"),
       JSON.stringify({
         prompt: this._prompt,
         kbPath: this._kbId,
