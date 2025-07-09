@@ -1,4 +1,3 @@
-import "dotenv/config";
 import TelegramBot from "node-telegram-bot-api";
 import { AppState, Waiter } from "./state";
 import path from "path";
