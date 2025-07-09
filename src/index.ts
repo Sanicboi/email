@@ -92,7 +92,7 @@ bot.onText(/\/info/, async (msg) => {
 bot.onText(/\/mail/, async (msg) => {
   state.waiter = null;
   state.resId = null;
-  await sendFirst(state);
+  sendFirst(state);
 })
 
 bot.onText(/\/settings/, async (msg) => {

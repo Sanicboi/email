@@ -52,18 +52,14 @@ export const respond = async (text: string, state: AppState) => {
 };
 
 
-export const sendFirst = async (state: AppState) => {
-      await new Promise<void>((resolve, reject) => {
+export const sendFirst = (state: AppState) => {
     transporter.sendMail({
         to: state.email!,
         subject: 'Mailing test',
         text: state.firstMsg,
     }, (err, info) => {
-        if (!err) {
-            resolve()
-        } else {
-            reject()
+        if (err) {
+            console.error(err);
         }
-    })
-  })
+  });
 }
