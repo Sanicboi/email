@@ -66,10 +66,6 @@ const poll = async () => {
 
 bot.setMyCommands([
   {
-    command: "start",
-    description: "Начать новый диалог",
-  },
-  {
     command: "info",
     description: "Информация",
   },
@@ -94,6 +90,8 @@ bot.onText(/\/info/, async (msg) => {
 });
 
 bot.onText(/\/mail/, async (msg) => {
+  state.waiter = null;
+  state.resId = null;
   await sendFirst(state);
 })
 
