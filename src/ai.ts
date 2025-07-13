@@ -11,7 +11,7 @@ const transporter = nodemailer.createTransport({
     secure: true,
     auth: {
         user: 'adamarttech@yandex.ru',
-        pass: process.env.YANDEX_PASS
+        pass: process.env.YANDEX_PASS_V2
     }
 });
 
