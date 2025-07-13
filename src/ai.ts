@@ -5,13 +5,14 @@ import { replyToMessage } from "./writer";
 import nodemailer from 'nodemailer';
 import 'dotenv/config';
 
+console.log(process.env.YANDEX_PASS_V2);
 const transporter = nodemailer.createTransport({
     host: 'smtp.yandex.ru',
     port: 465,
     secure: true,
     auth: {
         user: 'adamarttech@yandex.ru',
-        pass: process.env.YANDEX_PASS_V2
+        pass: process.env.YANDEX_PASS
     }
 });
 
