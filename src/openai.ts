@@ -170,7 +170,7 @@ class AIServiceImpl extends UnimplementedAIService {
 const server = new grpc.Server();
 server.addService(AIServiceImpl.definition, new AIServiceImpl());
 server.bindAsync(
-  "localhost:8080",
+  "0.0.0.0:8080",
   grpc.ServerCredentials.createInsecure(),
   async () => {
     console.log("server started");
