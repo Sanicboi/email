@@ -169,4 +169,4 @@ imapflow
     command: 'start',
     description: 'Инфо'
   }]))
-  .then(() => setInterval(poll, 30000));
+  .then(() => setInterval(poll, 10000));
