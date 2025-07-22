@@ -113,6 +113,7 @@ const poll = async () => {
           text: response.text,
           to: addr,
           from: process.env.YANDEX_USER!,
+          subject: 'Тестовые сообщения'
         });
         await imapflow.messageFlagsAdd(message.uid, ["\\Seen"]);
       } catch (error) {
