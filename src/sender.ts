@@ -64,7 +64,10 @@ const poll = async () => {
           continue;
         console.log("Message has a sender");
         const addr = message.envelope.sender[0].address;
-        if (!idsMap.has(addr)) continue;
+        if (!idsMap.has(addr)) {
+          await imapflow.messageFlagsAdd(message.uid, ["\\Seen"]);
+          continue;
+        }
         console.log("Sender is in the map");
         if (!message.source) continue;
         console.log("Message has a body");
@@ -169,4 +172,4 @@ imapflow
     command: 'start',
     description: 'Инфо'
   }]))
-  .then(() => setInterval(poll, 10000));
+  .then(() => setInterval(poll, 5000));
