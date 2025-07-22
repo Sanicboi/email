@@ -38,14 +38,10 @@ const bot = new TelegramBot(process.env.TG_TOKEN!, {
 })
 
 let emailsSet: Set<string> = new Set([
-  // "alexandrzezekalo@gmail.com",
-  // "alexandr.zezekalo@gmail.com",
-  "1377007@mail.ru",
-  // "Igoverh@ya.ru",
-  // "Niiro137@gmail.com",
-  // "9609645@gmail.com",
-  "1320311@mail.ru"
+
 ]);
+
+
 let idsMap: Map<string, string> = new Map();
 
 const client = new AIClient(
@@ -68,7 +64,7 @@ const poll = async () => {
           continue;
         console.log("Message has a sender");
         const addr = message.envelope.sender[0].address;
-        if (!emailsSet.has(addr) || !idsMap.has(addr)) continue;
+        if (!idsMap.has(addr)) continue;
         console.log("Sender is in the map");
         if (!message.source) continue;
         console.log("Message has a body");
@@ -152,17 +148,18 @@ const mail = async () => {
       from: process.env.YANDEX_USER!,
       subject: 'Test'
     });
-    console.log(info);
+    emailsSet.delete(addr);
   }
 };
 
-bot.onText(/\/mail/, async (msg) => {
-  await bot.sendMessage(msg.chat.id, 'Отправляю письма...');
+bot.onText(/\/mail /, async (msg) => {
+  emailsSet.add(msg.text!.split(' ')[1]);
+  await bot.sendMessage(msg.chat.id, 'Письмо отправляется...');
   await mail();
   await bot.sendMessage(msg.chat.id, 'Письма отправлены');
 });
 bot.onText(/\/start/, async (msg) => {
-  await bot.sendMessage(msg.chat.id, 'Я - тестовый интерфейс рассыльщика');
+  await bot.sendMessage(msg.chat.id, 'Я - тестовый интерфейс рассыльщика. Запустить рассылку можно командой /mail. Для этого нужно написать боту "/mail address@mail.com"');
 })
 
 imapflow
@@ -170,8 +167,5 @@ imapflow
   .then(() => bot.setMyCommands([{
     command: 'start',
     description: 'Инфо'
-  }, {
-    command: 'mail',
-    description: ' Запустить рассылку'
   }]))
   .then(() => setInterval(poll, 30000));
