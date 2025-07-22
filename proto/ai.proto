@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+service AI {
+    rpc generateFirstMessage(FirstMessageData) returns (MsgOutput);
+    rpc evaluateInput(TextInput) returns (Evaluation);
+    rpc generateResponse(MsgInput) returns (MsgOutput);
+    rpc evaluateOutput(IDOnly) returns (Evaluation);
+    rpc regenerateResponse(MsgInput) returns (MsgOutput);
+}
+
+message FirstMessageData {
+    string leadData = 1;
+}
+
+message Evaluation {
+    string comment = 1;
+    uint32 rating = 2;
+}
+
+message IDOnly {
+    string id = 1;
+}
+
+message MsgOutput {
+    string text = 1;
+    string id = 2;
+}
+
+message TextInput {
+    string text = 1;
+}
+
+message MsgInput {
+    string text = 1;
+    string previousId = 2;
+}

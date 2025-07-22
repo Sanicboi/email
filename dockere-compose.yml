@@ -1,0 +1,13 @@
+version: "3.0"
+services:
+  openai:
+    restart: always
+    command: ["npm", "run", "openai"]
+    build: .
+    env_file: .env
+    ports:
+      -"8080:8080"
+  mailer:
+    restart: always
+    build: .
+    env_file: .env
