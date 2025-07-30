@@ -9,6 +9,7 @@ const command = [
   "protoc",
   `--plugin=protoc-gen-ts=${path.join(process.cwd(), "node_modules", ".bin", `protoc-gen-ts${os.platform() === "win32" ? ".cmd" : ""}`)}`,
   `--js_out=import_style=commonjs,binary:${outDir}`,
+  '--ts_opt=unary_rpc_promise=true',
   `--ts_out=${outDir}`,
   `-I ${protoDir}`,
   path.join(protoDir, "*.proto"),

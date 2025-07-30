@@ -1,36 +1,24 @@
 syntax = "proto3";
 
+import "shared.proto";
+import "configuration.proto";
+import "files.proto";
+import "generation.proto";
+
 service AI {
-    rpc generateFirstMessage(FirstMessageData) returns (MsgOutput);
-    rpc evaluateInput(TextInput) returns (Evaluation);
-    rpc generateResponse(MsgInput) returns (MsgOutput);
-    rpc evaluateOutput(IDOnly) returns (Evaluation);
-    rpc regenerateResponse(MsgInput) returns (MsgOutput);
-}
+    rpc generateFirstMessage(FirstMessageGenerationRequest) returns (MessageGenerationResult);
+    rpc evaluateInput(InputEvaluationRequest) returns (Evaluation);
+    rpc generateResponse(ResponseGenerationRequest) returns (MessageGenerationResult);
+    rpc evaluateOutput(OutputEvaluationRequest) returns (Evaluation);
+    rpc regenerateResponse(ResponseGenerationRequest) returns (MessageGenerationResult);
 
-message FirstMessageData {
-    string leadData = 1;
-}
 
-message Evaluation {
-    string comment = 1;
-    uint32 rating = 2;
-}
+    rpc getFiles(Empty) returns (FilesList);
+    rpc addFile(FileUploadRequest) returns (Empty);
+    rpc deleteFile(FileName) returns (Empty);
 
-message IDOnly {
-    string id = 1;
-}
-
-message MsgOutput {
-    string text = 1;
-    string id = 2;
-}
-
-message TextInput {
-    string text = 1;
-}
-
-message MsgInput {
-    string text = 1;
-    string previousId = 2;
+    rpc getPrompt(Empty) returns (Prompt);
+    rpc editPrompt(Prompt) returns (Empty);
+    rpc getModel(Empty) returns (Model);
+    rpc editModel(Model) returns (Empty);
 }

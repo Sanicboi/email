@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+
+
+message FirstMessageGenerationRequest {
+    string userData = 1;
+}
+
+message MessageGenerationResult {
+    string text = 1;
+    string id = 2;
+}
+
+message InputEvaluationRequest {
+    string text = 1;
+}
+
+
+message Evaluation {
+    string comment = 1;
+    uint32 rating = 2;
+}
+
+message ResponseGenerationRequest {
+    string text = 1;
+    string previousId = 2;
+}
+
+message OutputEvaluationRequest {
+    string id = 1;
+}

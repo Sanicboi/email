@@ -34,13 +34,10 @@ const mailer = nodemailer.createTransport({
 });
 
 const bot = new TelegramBot(process.env.TG_TOKEN!, {
-  polling: true
-})
+  polling: true,
+});
 
-let emailsSet: Set<string> = new Set([
-
-]);
-
+let emailsSet: Set<string> = new Set([]);
 
 let idsMap: Map<string, string> = new Map();
 
@@ -52,12 +49,15 @@ const client = new AIClient(
 const poll = async () => {
   let lock = await imapflow.getMailboxLock("INBOX");
   try {
-    for await (const message of imapflow.fetch({
-      seen: false
-    }, {
-      source: true,
-      envelope: true,
-    })) {
+    for await (const message of imapflow.fetch(
+      {
+        seen: false,
+      },
+      {
+        source: true,
+        envelope: true,
+      },
+    )) {
       try {
         console.log("Message found");
         if (!message.envelope?.sender || !message.envelope.sender[0].address)
@@ -116,7 +116,7 @@ const poll = async () => {
           text: response.text,
           to: addr,
           from: process.env.YANDEX_USER!,
-          subject: 'Тестовые сообщения'
+          subject: "Тестовые сообщения",
         });
         await imapflow.messageFlagsAdd(message.uid, ["\\Seen"]);
       } catch (error) {
@@ -150,26 +150,33 @@ const mail = async () => {
       to: addr,
       text: first.text,
       from: process.env.YANDEX_USER!,
-      subject: 'Test'
+      subject: "Test",
     });
     emailsSet.delete(addr);
   }
 };
 
 bot.onText(/\/mail /, async (msg) => {
-  emailsSet.add(msg.text!.split(' ')[1]);
-  await bot.sendMessage(msg.chat.id, 'Письмо отправляется...');
+  emailsSet.add(msg.text!.split(" ")[1]);
+  await bot.sendMessage(msg.chat.id, "Письмо отправляется...");
   await mail();
-  await bot.sendMessage(msg.chat.id, 'Письма отправлены');
+  await bot.sendMessage(msg.chat.id, "Письма отправлены");
 });
 bot.onText(/\/start/, async (msg) => {
-  await bot.sendMessage(msg.chat.id, 'Я - тестовый интерфейс рассыльщика. Запустить рассылку можно командой /mail. Для этого нужно написать боту "/mail address@mail.com"');
-})
+  await bot.sendMessage(
+    msg.chat.id,
+    'Я - тестовый интерфейс рассыльщика. Запустить рассылку можно командой /mail. Для этого нужно написать боту "/mail address@mail.com"',
+  );
+});
 
 imapflow
   .connect()
-  .then(() => bot.setMyCommands([{
-    command: 'start',
-    description: 'Инфо'
-  }]))
+  .then(() =>
+    bot.setMyCommands([
+      {
+        command: "start",
+        description: "Инфо",
+      },
+    ]),
+  )
   .then(() => setInterval(poll, 5000));

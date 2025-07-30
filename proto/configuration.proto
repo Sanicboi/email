@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+
+
+message Model {
+    string model = 1;
+}
+
+message Prompt {
+    string prompt = 1;
+}

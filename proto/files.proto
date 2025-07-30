@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+
+
+message FileName {
+    string name = 1;
+}
+
+message FilesList {
+    repeated FileName names = 1;
+}
+
+message FileUploadRequest {
+    string name = 1;
+    bytes content = 2;
+}
