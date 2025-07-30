@@ -45,7 +45,7 @@ db.initialize().then(async () => {
       new FileUploadRequest({
         content: req.file.buffer,
         name: `${v4()}${path.extname(req.file.originalname)}`,
-      })
+      }),
     );
     res.status(201).end();
   });
@@ -55,7 +55,7 @@ db.initialize().then(async () => {
       await client.deleteFile(
         new FileName({
           name: req.params.name,
-        })
+        }),
       );
       res.status(204).end();
     } catch (error) {
@@ -81,17 +81,17 @@ db.initialize().then(async () => {
           prompt: any;
         }
       >,
-      res
+      res,
     ) => {
       if (!req.body.prompt || typeof req.body.prompt !== "string")
         return res.status(400).end();
       await client.editPrompt(
         new Prompt({
           prompt: req.body.prompt,
-        })
+        }),
       );
       res.status(204).end();
-    }
+    },
   );
 
   app.get("/api/ai/model", async (req, res) => {
@@ -111,7 +111,7 @@ db.initialize().then(async () => {
           model?: string;
         }
       >,
-      res
+      res,
     ) => {
       try {
         if (!req.body.model || typeof req.body.model !== "string")
@@ -119,14 +119,14 @@ db.initialize().then(async () => {
         await client.editModel(
           new Model({
             model: req.body.model,
-          })
+          }),
         );
         res.status(204).end();
       } catch (error) {
         console.error(error);
         res.status(400).end();
       }
-    }
+    },
   );
 
   app.put(
@@ -141,7 +141,7 @@ db.initialize().then(async () => {
       if (req.body.waitTime) config.waitTime = req.body.waitTime;
       await config.save();
       res.status(204).end();
-    }
+    },
   );
 
   app.get("/api/users", async (req, res) => {
@@ -160,7 +160,7 @@ db.initialize().then(async () => {
           data?: string;
         }
       >,
-      res
+      res,
     ) => {
       if (!req.body.email || !req.body.data) return res.status(400).end();
       const user = new User();
@@ -168,7 +168,7 @@ db.initialize().then(async () => {
       user.data = req.body.data;
       await manager.save(user);
       res.status(201).end();
-    }
+    },
   );
 
   app.get("/api/users/:id/events", async (req, res) => {
@@ -194,13 +194,13 @@ db.initialize().then(async () => {
           amount: any;
         }
       >,
-      res
+      res,
     ) => {
       if (!req.body.amount || typeof req.body.amount !== "number")
         return res.status(400).end();
       await onMail(req.body.amount);
       res.status(201).end();
-    }
+    },
   );
 
   app.listen(5000);

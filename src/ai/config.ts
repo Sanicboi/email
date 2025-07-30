@@ -11,7 +11,7 @@ export type model =
 class AIConfiguration {
   private _prompt: string;
   private _model: model;
-  private _path = path.join(process.cwd(), "data", 'ai', "config.json");
+  private _path = path.join(process.cwd(), "data", "ai", "config.json");
 
   public constructor() {}
 

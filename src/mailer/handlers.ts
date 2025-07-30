@@ -14,19 +14,19 @@ import { smtp } from "./smtp";
 
 export const onReceive = async (
   user: User,
-  data: IIncomingMail
+  data: IIncomingMail,
 ): Promise<void> => {
   if (user.status === UserStatus.Error || user.status === UserStatus.Finished)
     return;
   const evaluation = await client.evaluateInput(
     new InputEvaluationRequest({
       text: data.text,
-    })
+    }),
   );
   await createEvent(
     user,
     "Message evaluated",
-    `Rating: ${evaluation.rating}.\nComment:\n${evaluation.comment}`
+    `Rating: ${evaluation.rating}.\nComment:\n${evaluation.comment}`,
   );
 
   if (user.status === UserStatus.Sent) {
@@ -52,7 +52,7 @@ export const onReceive = async (
     new ResponseGenerationRequest({
       previousId: user.resId,
       text: data.text,
-    })
+    }),
   );
 
   await createEvent(user, "Response created", response.text);
@@ -61,9 +61,13 @@ export const onReceive = async (
   let resEval = await client.evaluateOutput(
     new OutputEvaluationRequest({
       id: response.id,
-    })
+    }),
   );
-  await createEvent(user, `Response evaluated: ${resEval.rating}`, resEval.comment);
+  await createEvent(
+    user,
+    `Response evaluated: ${resEval.rating}`,
+    resEval.comment,
+  );
 
   let numGens = 1;
 
@@ -73,19 +77,23 @@ export const onReceive = async (
       new ResponseGenerationRequest({
         previousId: response.id,
         text: resEval.comment,
-      })
+      }),
     );
     await createEvent(user, "Response created", response.text);
     resEval = await client.evaluateOutput(
       new OutputEvaluationRequest({
         id: response.id,
-      })
+      }),
     );
-    await createEvent(user, `Response evaluated: ${resEval.rating}`, resEval.comment);
+    await createEvent(
+      user,
+      `Response evaluated: ${resEval.rating}`,
+      resEval.comment,
+    );
   }
 
   if (resEval.rating < config.sendRating) {
-    await createEvent(user, 'Response rejected');
+    await createEvent(user, "Response rejected");
     user.status = UserStatus.Error;
     await manager.save(user);
     return;
@@ -98,23 +106,24 @@ export const onReceive = async (
     text: response.text,
     sender: process.env.YANDEX_USER!,
     to: user.email,
-    subject: config.topic
+    subject: config.topic,
   });
-  await createEvent(user, 'Message sent');
+  await createEvent(user, "Message sent");
 };
-
 
 export const onMail = async (amount: number) => {
   const users = await manager.find(User, {
-    take: amount
+    take: amount,
   });
 
   for (const user of users) {
     try {
-      const firstMessage = await client.generateFirstMessage(new FirstMessageGenerationRequest({
-        userData: user.data
-      }));
-      await createEvent(user, 'First message created', firstMessage.text);
+      const firstMessage = await client.generateFirstMessage(
+        new FirstMessageGenerationRequest({
+          userData: user.data,
+        }),
+      );
+      await createEvent(user, "First message created", firstMessage.text);
       user.status = UserStatus.Sent;
       user.resId = firstMessage.id;
       await manager.save(user);
@@ -122,12 +131,12 @@ export const onMail = async (amount: number) => {
         text: firstMessage.text,
         sender: process.env.YANDEX_USER!,
         subject: config.topic,
-        to: user.email
-      })
+        to: user.email,
+      });
     } catch (error) {
       console.error(error);
       user.status = UserStatus.Error;
       await manager.save(user);
     }
   }
-}
+};

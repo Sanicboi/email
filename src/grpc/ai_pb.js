@@ -11,15 +11,17 @@
 /* eslint-disable */
 // @ts-nocheck
 
-var jspb = require('google-protobuf');
+var jspb = require("google-protobuf");
 var goog = jspb;
-var global = (function() { return this || window || global || self || Function('return this')(); }).call(null);
+var global = function () {
+  return this || window || global || self || Function("return this")();
+}.call(null);
 
-var shared_pb = require('./shared_pb.js');
+var shared_pb = require("./shared_pb.js");
 goog.object.extend(proto, shared_pb);
-var configuration_pb = require('./configuration_pb.js');
+var configuration_pb = require("./configuration_pb.js");
 goog.object.extend(proto, configuration_pb);
-var files_pb = require('./files_pb.js');
+var files_pb = require("./files_pb.js");
 goog.object.extend(proto, files_pb);
-var generation_pb = require('./generation_pb.js');
+var generation_pb = require("./generation_pb.js");
 goog.object.extend(proto, generation_pb);

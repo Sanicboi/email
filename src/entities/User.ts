@@ -6,13 +6,12 @@ export enum UserStatus {
   NotSent = 1,
   Sent = 2,
   Dialogue = 3,
-  Finished = 4
+  Finished = 4,
 }
 
 @Entity()
 export class User {
-
-  @PrimaryColumn('uuid')
+  @PrimaryColumn("uuid")
   id: string;
 
   @Column()
@@ -22,12 +21,12 @@ export class User {
   data: string;
 
   @Column({
-    nullable: true
+    nullable: true,
   })
   resId: string;
 
-  @Column('int', {
-    default: UserStatus.NotSent
+  @Column("int", {
+    default: UserStatus.NotSent,
   })
   status: UserStatus;
 

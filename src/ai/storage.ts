@@ -39,8 +39,8 @@ export class StorageFile implements IStorageFile {
 }
 
 class Storage {
-  private _dir = path.join(process.cwd(), "data", 'ai', "storage");
-  private _confPath = path.join(process.cwd(), "data", 'ai', "storage.json");
+  private _dir = path.join(process.cwd(), "data", "ai", "storage");
+  private _confPath = path.join(process.cwd(), "data", "ai", "storage.json");
   private _files: Map<string, StorageFile> = new Map();
 
   public constructor() {}

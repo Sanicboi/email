@@ -9,5 +9,3 @@ export const smtp = nodemailer.createTransport({
     pass: process.env.YANDEX_PASS,
   },
 });
-
-
