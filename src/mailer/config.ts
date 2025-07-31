@@ -38,7 +38,6 @@ class MailerConfiguration implements IConfig {
   public asConfig(): IConfig {
     return {
       attempts: this.attempts,
-      crmRating: this.crmRating,
       responseRating: this.responseRating,
       sendRating: this.sendRating,
       specialRating: this.specialRating,
