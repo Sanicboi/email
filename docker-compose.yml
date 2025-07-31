@@ -11,3 +11,9 @@ services:
     restart: always
     build: .
     env_file: .env
+  postgres:
+    image: postgres
+    ports:
+      - "7755:5432"
+    env_file:
+      - .env
