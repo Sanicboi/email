@@ -8,6 +8,8 @@ services:
     ports:
       - "8080:8080"
   mailer:
+    ports:
+      - "80:5000"
     restart: always
     build: .
     env_file: .env
