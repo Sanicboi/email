@@ -51,7 +51,7 @@ export class AIServiceImpl extends UnimplementedAIService {
       data: Buffer.from(call.request.content),
       name: call.request.name,
     });
-    callback(null);
+    callback(null, new Empty());
   }
 
   public async deleteFile(
@@ -59,7 +59,7 @@ export class AIServiceImpl extends UnimplementedAIService {
     callback: sendUnaryData<Empty>,
   ): Promise<void> {
     await storage.deleteFile(call.request.name);
-    callback(null);
+    callback(null, new Empty());
   }
 
   public async getModel(
@@ -79,7 +79,7 @@ export class AIServiceImpl extends UnimplementedAIService {
     callback: sendUnaryData<Empty>,
   ): Promise<void> {
     await config.setModel(call.request.model as model);
-    callback(null);
+    callback(null, new Empty());
   }
 
   public async getPrompt(
@@ -99,7 +99,7 @@ export class AIServiceImpl extends UnimplementedAIService {
     callback: sendUnaryData<Empty>,
   ): Promise<void> {
     await config.setPrompt(call.request.prompt);
-    callback(null);
+    callback(null, new Empty());
   }
 
   public async generateFirstMessage(
