@@ -8,7 +8,7 @@ export const db = new DataSource({
   password: process.env.POSTGRES_PASSWORD,
   username: process.env.POSTGRES_USER,
   migrations: [],
-  entities: [User],
+  entities: [User, Event],
   host: "postgres",
   port: 5432,
   logging: false,
