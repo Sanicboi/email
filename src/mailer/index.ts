@@ -156,7 +156,7 @@ db.initialize().then(async () => {
   });
 
   app.post(
-    "/api/user",
+    "/api/users",
     async (
       req: express.Request<
         any,
