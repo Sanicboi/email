@@ -5,8 +5,8 @@
   "scripts": {
     "format": "prettier --write .",
     "proto": "ts-node ./scripts/genTypes.ts",
-    "openai": "ts-node ./src/openai.ts",
-    "mail": "ts-node ./src/index.ts"
+    "openai": "ts-node ./src/ai/index.ts",
+    "mail": "ts-node ./src/mailer/index.ts"
   },
   "keywords": [],
   "author": "",
