@@ -6,7 +6,7 @@
     "format": "prettier --write .",
     "proto": "ts-node ./scripts/genTypes.ts",
     "openai": "ts-node ./src/openai.ts",
-    "mail": "ts-node ./src/sender.ts"
+    "mail": "ts-node ./src/index.ts"
   },
   "keywords": [],
   "author": "",
