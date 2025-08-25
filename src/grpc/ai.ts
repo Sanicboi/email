@@ -6,666 +6,1014 @@
 import * as dependency_1 from "./shared";
 import * as dependency_2 from "./configuration";
 import * as dependency_3 from "./files";
-import * as dependency_4 from "./generation";
+import * as pb_1 from "google-protobuf";
 import * as grpc_1 from "@grpc/grpc-js";
+export enum EvaluationStatus {
+    PASS = 0,
+    FAIL = 1
+}
+export class FilterValue extends pb_1.Message {
+    #one_of_decls: number[][] = [];
+    constructor(data?: any[] | {
+        value?: number;
+    }) {
+        super();
+        pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+        if (!Array.isArray(data) && typeof data == "object") {
+            if ("value" in data && data.value != undefined) {
+                this.value = data.value;
+            }
+        }
+    }
+    get value() {
+        return pb_1.Message.getFieldWithDefault(this, 1, 0) as number;
+    }
+    set value(value: number) {
+        pb_1.Message.setField(this, 1, value);
+    }
+    static fromObject(data: {
+        value?: number;
+    }): FilterValue {
+        const message = new FilterValue({});
+        if (data.value != null) {
+            message.value = data.value;
+        }
+        return message;
+    }
+    toObject() {
+        const data: {
+            value?: number;
+        } = {};
+        if (this.value != null) {
+            data.value = this.value;
+        }
+        return data;
+    }
+    serialize(): Uint8Array;
+    serialize(w: pb_1.BinaryWriter): void;
+    serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+        const writer = w || new pb_1.BinaryWriter();
+        if (this.value != 0)
+            writer.writeInt32(1, this.value);
+        if (!w)
+            return writer.getResultBuffer();
+    }
+    static deserialize(bytes: Uint8Array | pb_1.BinaryReader): FilterValue {
+        const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new FilterValue();
+        while (reader.nextField()) {
+            if (reader.isEndGroup())
+                break;
+            switch (reader.getFieldNumber()) {
+                case 1:
+                    message.value = reader.readInt32();
+                    break;
+                default: reader.skipField();
+            }
+        }
+        return message;
+    }
+    serializeBinary(): Uint8Array {
+        return this.serialize();
+    }
+    static deserializeBinary(bytes: Uint8Array): FilterValue {
+        return FilterValue.deserialize(bytes);
+    }
+}
+export class UserData extends pb_1.Message {
+    #one_of_decls: number[][] = [];
+    constructor(data?: any[] | {
+        data?: string;
+    }) {
+        super();
+        pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+        if (!Array.isArray(data) && typeof data == "object") {
+            if ("data" in data && data.data != undefined) {
+                this.data = data.data;
+            }
+        }
+    }
+    get data() {
+        return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
+    }
+    set data(value: string) {
+        pb_1.Message.setField(this, 1, value);
+    }
+    static fromObject(data: {
+        data?: string;
+    }): UserData {
+        const message = new UserData({});
+        if (data.data != null) {
+            message.data = data.data;
+        }
+        return message;
+    }
+    toObject() {
+        const data: {
+            data?: string;
+        } = {};
+        if (this.data != null) {
+            data.data = this.data;
+        }
+        return data;
+    }
+    serialize(): Uint8Array;
+    serialize(w: pb_1.BinaryWriter): void;
+    serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+        const writer = w || new pb_1.BinaryWriter();
+        if (this.data.length)
+            writer.writeString(1, this.data);
+        if (!w)
+            return writer.getResultBuffer();
+    }
+    static deserialize(bytes: Uint8Array | pb_1.BinaryReader): UserData {
+        const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new UserData();
+        while (reader.nextField()) {
+            if (reader.isEndGroup())
+                break;
+            switch (reader.getFieldNumber()) {
+                case 1:
+                    message.data = reader.readString();
+                    break;
+                default: reader.skipField();
+            }
+        }
+        return message;
+    }
+    serializeBinary(): Uint8Array {
+        return this.serialize();
+    }
+    static deserializeBinary(bytes: Uint8Array): UserData {
+        return UserData.deserialize(bytes);
+    }
+}
+export class FirstMessage extends pb_1.Message {
+    #one_of_decls: number[][] = [];
+    constructor(data?: any[] | {
+        id?: string;
+        text?: string;
+    }) {
+        super();
+        pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+        if (!Array.isArray(data) && typeof data == "object") {
+            if ("id" in data && data.id != undefined) {
+                this.id = data.id;
+            }
+            if ("text" in data && data.text != undefined) {
+                this.text = data.text;
+            }
+        }
+    }
+    get id() {
+        return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
+    }
+    set id(value: string) {
+        pb_1.Message.setField(this, 1, value);
+    }
+    get text() {
+        return pb_1.Message.getFieldWithDefault(this, 2, "") as string;
+    }
+    set text(value: string) {
+        pb_1.Message.setField(this, 2, value);
+    }
+    static fromObject(data: {
+        id?: string;
+        text?: string;
+    }): FirstMessage {
+        const message = new FirstMessage({});
+        if (data.id != null) {
+            message.id = data.id;
+        }
+        if (data.text != null) {
+            message.text = data.text;
+        }
+        return message;
+    }
+    toObject() {
+        const data: {
+            id?: string;
+            text?: string;
+        } = {};
+        if (this.id != null) {
+            data.id = this.id;
+        }
+        if (this.text != null) {
+            data.text = this.text;
+        }
+        return data;
+    }
+    serialize(): Uint8Array;
+    serialize(w: pb_1.BinaryWriter): void;
+    serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+        const writer = w || new pb_1.BinaryWriter();
+        if (this.id.length)
+            writer.writeString(1, this.id);
+        if (this.text.length)
+            writer.writeString(2, this.text);
+        if (!w)
+            return writer.getResultBuffer();
+    }
+    static deserialize(bytes: Uint8Array | pb_1.BinaryReader): FirstMessage {
+        const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new FirstMessage();
+        while (reader.nextField()) {
+            if (reader.isEndGroup())
+                break;
+            switch (reader.getFieldNumber()) {
+                case 1:
+                    message.id = reader.readString();
+                    break;
+                case 2:
+                    message.text = reader.readString();
+                    break;
+                default: reader.skipField();
+            }
+        }
+        return message;
+    }
+    serializeBinary(): Uint8Array {
+        return this.serialize();
+    }
+    static deserializeBinary(bytes: Uint8Array): FirstMessage {
+        return FirstMessage.deserialize(bytes);
+    }
+}
+export class UserMessage extends pb_1.Message {
+    #one_of_decls: number[][] = [];
+    constructor(data?: any[] | {
+        text?: string;
+        id?: string;
+    }) {
+        super();
+        pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+        if (!Array.isArray(data) && typeof data == "object") {
+            if ("text" in data && data.text != undefined) {
+                this.text = data.text;
+            }
+            if ("id" in data && data.id != undefined) {
+                this.id = data.id;
+            }
+        }
+    }
+    get text() {
+        return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
+    }
+    set text(value: string) {
+        pb_1.Message.setField(this, 1, value);
+    }
+    get id() {
+        return pb_1.Message.getFieldWithDefault(this, 2, "") as string;
+    }
+    set id(value: string) {
+        pb_1.Message.setField(this, 2, value);
+    }
+    static fromObject(data: {
+        text?: string;
+        id?: string;
+    }): UserMessage {
+        const message = new UserMessage({});
+        if (data.text != null) {
+            message.text = data.text;
+        }
+        if (data.id != null) {
+            message.id = data.id;
+        }
+        return message;
+    }
+    toObject() {
+        const data: {
+            text?: string;
+            id?: string;
+        } = {};
+        if (this.text != null) {
+            data.text = this.text;
+        }
+        if (this.id != null) {
+            data.id = this.id;
+        }
+        return data;
+    }
+    serialize(): Uint8Array;
+    serialize(w: pb_1.BinaryWriter): void;
+    serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+        const writer = w || new pb_1.BinaryWriter();
+        if (this.text.length)
+            writer.writeString(1, this.text);
+        if (this.id.length)
+            writer.writeString(2, this.id);
+        if (!w)
+            return writer.getResultBuffer();
+    }
+    static deserialize(bytes: Uint8Array | pb_1.BinaryReader): UserMessage {
+        const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new UserMessage();
+        while (reader.nextField()) {
+            if (reader.isEndGroup())
+                break;
+            switch (reader.getFieldNumber()) {
+                case 1:
+                    message.text = reader.readString();
+                    break;
+                case 2:
+                    message.id = reader.readString();
+                    break;
+                default: reader.skipField();
+            }
+        }
+        return message;
+    }
+    serializeBinary(): Uint8Array {
+        return this.serialize();
+    }
+    static deserializeBinary(bytes: Uint8Array): UserMessage {
+        return UserMessage.deserialize(bytes);
+    }
+}
+export class ResponseData extends pb_1.Message {
+    #one_of_decls: number[][] = [[7], [8], [9], [10]];
+    constructor(data?: any[] | ({
+        status?: EvaluationStatus;
+        evaluationComment?: string;
+        importance?: number;
+        enthusiasm?: number;
+        delayed?: boolean;
+        delayDate?: string;
+    } & (({
+        response?: string;
+    }) | ({
+        responseRating?: number;
+    }) | ({
+        responseComment?: string;
+    }) | ({
+        responseId?: string;
+    })))) {
+        super();
+        pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+        if (!Array.isArray(data) && typeof data == "object") {
+            if ("status" in data && data.status != undefined) {
+                this.status = data.status;
+            }
+            if ("evaluationComment" in data && data.evaluationComment != undefined) {
+                this.evaluationComment = data.evaluationComment;
+            }
+            if ("importance" in data && data.importance != undefined) {
+                this.importance = data.importance;
+            }
+            if ("enthusiasm" in data && data.enthusiasm != undefined) {
+                this.enthusiasm = data.enthusiasm;
+            }
+            if ("delayed" in data && data.delayed != undefined) {
+                this.delayed = data.delayed;
+            }
+            if ("delayDate" in data && data.delayDate != undefined) {
+                this.delayDate = data.delayDate;
+            }
+            if ("response" in data && data.response != undefined) {
+                this.response = data.response;
+            }
+            if ("responseRating" in data && data.responseRating != undefined) {
+                this.responseRating = data.responseRating;
+            }
+            if ("responseComment" in data && data.responseComment != undefined) {
+                this.responseComment = data.responseComment;
+            }
+            if ("responseId" in data && data.responseId != undefined) {
+                this.responseId = data.responseId;
+            }
+        }
+    }
+    get status() {
+        return pb_1.Message.getFieldWithDefault(this, 1, EvaluationStatus.PASS) as EvaluationStatus;
+    }
+    set status(value: EvaluationStatus) {
+        pb_1.Message.setField(this, 1, value);
+    }
+    get evaluationComment() {
+        return pb_1.Message.getFieldWithDefault(this, 2, "") as string;
+    }
+    set evaluationComment(value: string) {
+        pb_1.Message.setField(this, 2, value);
+    }
+    get importance() {
+        return pb_1.Message.getFieldWithDefault(this, 3, 0) as number;
+    }
+    set importance(value: number) {
+        pb_1.Message.setField(this, 3, value);
+    }
+    get enthusiasm() {
+        return pb_1.Message.getFieldWithDefault(this, 4, 0) as number;
+    }
+    set enthusiasm(value: number) {
+        pb_1.Message.setField(this, 4, value);
+    }
+    get delayed() {
+        return pb_1.Message.getFieldWithDefault(this, 5, false) as boolean;
+    }
+    set delayed(value: boolean) {
+        pb_1.Message.setField(this, 5, value);
+    }
+    get delayDate() {
+        return pb_1.Message.getFieldWithDefault(this, 6, "") as string;
+    }
+    set delayDate(value: string) {
+        pb_1.Message.setField(this, 6, value);
+    }
+    get response() {
+        return pb_1.Message.getFieldWithDefault(this, 7, "") as string;
+    }
+    set response(value: string) {
+        pb_1.Message.setOneofField(this, 7, this.#one_of_decls[0], value);
+    }
+    get has_response() {
+        return pb_1.Message.getField(this, 7) != null;
+    }
+    get responseRating() {
+        return pb_1.Message.getFieldWithDefault(this, 8, 0) as number;
+    }
+    set responseRating(value: number) {
+        pb_1.Message.setOneofField(this, 8, this.#one_of_decls[1], value);
+    }
+    get has_responseRating() {
+        return pb_1.Message.getField(this, 8) != null;
+    }
+    get responseComment() {
+        return pb_1.Message.getFieldWithDefault(this, 9, "") as string;
+    }
+    set responseComment(value: string) {
+        pb_1.Message.setOneofField(this, 9, this.#one_of_decls[2], value);
+    }
+    get has_responseComment() {
+        return pb_1.Message.getField(this, 9) != null;
+    }
+    get responseId() {
+        return pb_1.Message.getFieldWithDefault(this, 10, "") as string;
+    }
+    set responseId(value: string) {
+        pb_1.Message.setOneofField(this, 10, this.#one_of_decls[3], value);
+    }
+    get has_responseId() {
+        return pb_1.Message.getField(this, 10) != null;
+    }
+    get _response() {
+        const cases: {
+            [index: number]: "none" | "response";
+        } = {
+            0: "none",
+            7: "response"
+        };
+        return cases[pb_1.Message.computeOneofCase(this, [7])];
+    }
+    get _responseRating() {
+        const cases: {
+            [index: number]: "none" | "responseRating";
+        } = {
+            0: "none",
+            8: "responseRating"
+        };
+        return cases[pb_1.Message.computeOneofCase(this, [8])];
+    }
+    get _responseComment() {
+        const cases: {
+            [index: number]: "none" | "responseComment";
+        } = {
+            0: "none",
+            9: "responseComment"
+        };
+        return cases[pb_1.Message.computeOneofCase(this, [9])];
+    }
+    get _responseId() {
+        const cases: {
+            [index: number]: "none" | "responseId";
+        } = {
+            0: "none",
+            10: "responseId"
+        };
+        return cases[pb_1.Message.computeOneofCase(this, [10])];
+    }
+    static fromObject(data: {
+        status?: EvaluationStatus;
+        evaluationComment?: string;
+        importance?: number;
+        enthusiasm?: number;
+        delayed?: boolean;
+        delayDate?: string;
+        response?: string;
+        responseRating?: number;
+        responseComment?: string;
+        responseId?: string;
+    }): ResponseData {
+        const message = new ResponseData({});
+        if (data.status != null) {
+            message.status = data.status;
+        }
+        if (data.evaluationComment != null) {
+            message.evaluationComment = data.evaluationComment;
+        }
+        if (data.importance != null) {
+            message.importance = data.importance;
+        }
+        if (data.enthusiasm != null) {
+            message.enthusiasm = data.enthusiasm;
+        }
+        if (data.delayed != null) {
+            message.delayed = data.delayed;
+        }
+        if (data.delayDate != null) {
+            message.delayDate = data.delayDate;
+        }
+        if (data.response != null) {
+            message.response = data.response;
+        }
+        if (data.responseRating != null) {
+            message.responseRating = data.responseRating;
+        }
+        if (data.responseComment != null) {
+            message.responseComment = data.responseComment;
+        }
+        if (data.responseId != null) {
+            message.responseId = data.responseId;
+        }
+        return message;
+    }
+    toObject() {
+        const data: {
+            status?: EvaluationStatus;
+            evaluationComment?: string;
+            importance?: number;
+            enthusiasm?: number;
+            delayed?: boolean;
+            delayDate?: string;
+            response?: string;
+            responseRating?: number;
+            responseComment?: string;
+            responseId?: string;
+        } = {};
+        if (this.status != null) {
+            data.status = this.status;
+        }
+        if (this.evaluationComment != null) {
+            data.evaluationComment = this.evaluationComment;
+        }
+        if (this.importance != null) {
+            data.importance = this.importance;
+        }
+        if (this.enthusiasm != null) {
+            data.enthusiasm = this.enthusiasm;
+        }
+        if (this.delayed != null) {
+            data.delayed = this.delayed;
+        }
+        if (this.delayDate != null) {
+            data.delayDate = this.delayDate;
+        }
+        if (this.response != null) {
+            data.response = this.response;
+        }
+        if (this.responseRating != null) {
+            data.responseRating = this.responseRating;
+        }
+        if (this.responseComment != null) {
+            data.responseComment = this.responseComment;
+        }
+        if (this.responseId != null) {
+            data.responseId = this.responseId;
+        }
+        return data;
+    }
+    serialize(): Uint8Array;
+    serialize(w: pb_1.BinaryWriter): void;
+    serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+        const writer = w || new pb_1.BinaryWriter();
+        if (this.status != EvaluationStatus.PASS)
+            writer.writeEnum(1, this.status);
+        if (this.evaluationComment.length)
+            writer.writeString(2, this.evaluationComment);
+        if (this.importance != 0)
+            writer.writeInt32(3, this.importance);
+        if (this.enthusiasm != 0)
+            writer.writeInt32(4, this.enthusiasm);
+        if (this.delayed != false)
+            writer.writeBool(5, this.delayed);
+        if (this.delayDate.length)
+            writer.writeString(6, this.delayDate);
+        if (this.has_response)
+            writer.writeString(7, this.response);
+        if (this.has_responseRating)
+            writer.writeInt32(8, this.responseRating);
+        if (this.has_responseComment)
+            writer.writeString(9, this.responseComment);
+        if (this.has_responseId)
+            writer.writeString(10, this.responseId);
+        if (!w)
+            return writer.getResultBuffer();
+    }
+    static deserialize(bytes: Uint8Array | pb_1.BinaryReader): ResponseData {
+        const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new ResponseData();
+        while (reader.nextField()) {
+            if (reader.isEndGroup())
+                break;
+            switch (reader.getFieldNumber()) {
+                case 1:
+                    message.status = reader.readEnum();
+                    break;
+                case 2:
+                    message.evaluationComment = reader.readString();
+                    break;
+                case 3:
+                    message.importance = reader.readInt32();
+                    break;
+                case 4:
+                    message.enthusiasm = reader.readInt32();
+                    break;
+                case 5:
+                    message.delayed = reader.readBool();
+                    break;
+                case 6:
+                    message.delayDate = reader.readString();
+                    break;
+                case 7:
+                    message.response = reader.readString();
+                    break;
+                case 8:
+                    message.responseRating = reader.readInt32();
+                    break;
+                case 9:
+                    message.responseComment = reader.readString();
+                    break;
+                case 10:
+                    message.responseId = reader.readString();
+                    break;
+                default: reader.skipField();
+            }
+        }
+        return message;
+    }
+    serializeBinary(): Uint8Array {
+        return this.serialize();
+    }
+    static deserializeBinary(bytes: Uint8Array): ResponseData {
+        return ResponseData.deserialize(bytes);
+    }
+}
+export class DialogueData extends pb_1.Message {
+    #one_of_decls: number[][] = [];
+    constructor(data?: any[] | {
+        id?: string;
+    }) {
+        super();
+        pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+        if (!Array.isArray(data) && typeof data == "object") {
+            if ("id" in data && data.id != undefined) {
+                this.id = data.id;
+            }
+        }
+    }
+    get id() {
+        return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
+    }
+    set id(value: string) {
+        pb_1.Message.setField(this, 1, value);
+    }
+    static fromObject(data: {
+        id?: string;
+    }): DialogueData {
+        const message = new DialogueData({});
+        if (data.id != null) {
+            message.id = data.id;
+        }
+        return message;
+    }
+    toObject() {
+        const data: {
+            id?: string;
+        } = {};
+        if (this.id != null) {
+            data.id = this.id;
+        }
+        return data;
+    }
+    serialize(): Uint8Array;
+    serialize(w: pb_1.BinaryWriter): void;
+    serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+        const writer = w || new pb_1.BinaryWriter();
+        if (this.id.length)
+            writer.writeString(1, this.id);
+        if (!w)
+            return writer.getResultBuffer();
+    }
+    static deserialize(bytes: Uint8Array | pb_1.BinaryReader): DialogueData {
+        const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new DialogueData();
+        while (reader.nextField()) {
+            if (reader.isEndGroup())
+                break;
+            switch (reader.getFieldNumber()) {
+                case 1:
+                    message.id = reader.readString();
+                    break;
+                default: reader.skipField();
+            }
+        }
+        return message;
+    }
+    serializeBinary(): Uint8Array {
+        return this.serialize();
+    }
+    static deserializeBinary(bytes: Uint8Array): DialogueData {
+        return DialogueData.deserialize(bytes);
+    }
+}
 interface GrpcUnaryServiceInterface<P, R> {
-  (
-    message: P,
-    metadata: grpc_1.Metadata,
-    options: grpc_1.CallOptions,
-    callback: grpc_1.requestCallback<R>,
-  ): grpc_1.ClientUnaryCall;
-  (
-    message: P,
-    metadata: grpc_1.Metadata,
-    callback: grpc_1.requestCallback<R>,
-  ): grpc_1.ClientUnaryCall;
-  (
-    message: P,
-    options: grpc_1.CallOptions,
-    callback: grpc_1.requestCallback<R>,
-  ): grpc_1.ClientUnaryCall;
-  (message: P, callback: grpc_1.requestCallback<R>): grpc_1.ClientUnaryCall;
+    (message: P, metadata: grpc_1.Metadata, options: grpc_1.CallOptions, callback: grpc_1.requestCallback<R>): grpc_1.ClientUnaryCall;
+    (message: P, metadata: grpc_1.Metadata, callback: grpc_1.requestCallback<R>): grpc_1.ClientUnaryCall;
+    (message: P, options: grpc_1.CallOptions, callback: grpc_1.requestCallback<R>): grpc_1.ClientUnaryCall;
+    (message: P, callback: grpc_1.requestCallback<R>): grpc_1.ClientUnaryCall;
 }
 interface GrpcStreamServiceInterface<P, R> {
-  (
-    message: P,
-    metadata: grpc_1.Metadata,
-    options?: grpc_1.CallOptions,
-  ): grpc_1.ClientReadableStream<R>;
-  (message: P, options?: grpc_1.CallOptions): grpc_1.ClientReadableStream<R>;
+    (message: P, metadata: grpc_1.Metadata, options?: grpc_1.CallOptions): grpc_1.ClientReadableStream<R>;
+    (message: P, options?: grpc_1.CallOptions): grpc_1.ClientReadableStream<R>;
 }
 interface GrpWritableServiceInterface<P, R> {
-  (
-    metadata: grpc_1.Metadata,
-    options: grpc_1.CallOptions,
-    callback: grpc_1.requestCallback<R>,
-  ): grpc_1.ClientWritableStream<P>;
-  (
-    metadata: grpc_1.Metadata,
-    callback: grpc_1.requestCallback<R>,
-  ): grpc_1.ClientWritableStream<P>;
-  (
-    options: grpc_1.CallOptions,
-    callback: grpc_1.requestCallback<R>,
-  ): grpc_1.ClientWritableStream<P>;
-  (callback: grpc_1.requestCallback<R>): grpc_1.ClientWritableStream<P>;
+    (metadata: grpc_1.Metadata, options: grpc_1.CallOptions, callback: grpc_1.requestCallback<R>): grpc_1.ClientWritableStream<P>;
+    (metadata: grpc_1.Metadata, callback: grpc_1.requestCallback<R>): grpc_1.ClientWritableStream<P>;
+    (options: grpc_1.CallOptions, callback: grpc_1.requestCallback<R>): grpc_1.ClientWritableStream<P>;
+    (callback: grpc_1.requestCallback<R>): grpc_1.ClientWritableStream<P>;
 }
 interface GrpcChunkServiceInterface<P, R> {
-  (
-    metadata: grpc_1.Metadata,
-    options?: grpc_1.CallOptions,
-  ): grpc_1.ClientDuplexStream<P, R>;
-  (options?: grpc_1.CallOptions): grpc_1.ClientDuplexStream<P, R>;
+    (metadata: grpc_1.Metadata, options?: grpc_1.CallOptions): grpc_1.ClientDuplexStream<P, R>;
+    (options?: grpc_1.CallOptions): grpc_1.ClientDuplexStream<P, R>;
 }
 interface GrpcPromiseServiceInterface<P, R> {
-  (
-    message: P,
-    metadata: grpc_1.Metadata,
-    options?: grpc_1.CallOptions,
-  ): Promise<R>;
-  (message: P, options?: grpc_1.CallOptions): Promise<R>;
+    (message: P, metadata: grpc_1.Metadata, options?: grpc_1.CallOptions): Promise<R>;
+    (message: P, options?: grpc_1.CallOptions): Promise<R>;
 }
 export abstract class UnimplementedAIService {
-  static definition = {
-    generateFirstMessage: {
-      path: "/AI/generateFirstMessage",
-      requestStream: false,
-      responseStream: false,
-      requestSerialize: (message: dependency_4.FirstMessageGenerationRequest) =>
-        Buffer.from(message.serialize()),
-      requestDeserialize: (bytes: Buffer) =>
-        dependency_4.FirstMessageGenerationRequest.deserialize(
-          new Uint8Array(bytes),
-        ),
-      responseSerialize: (message: dependency_4.MessageGenerationResult) =>
-        Buffer.from(message.serialize()),
-      responseDeserialize: (bytes: Buffer) =>
-        dependency_4.MessageGenerationResult.deserialize(new Uint8Array(bytes)),
-    },
-    evaluateInput: {
-      path: "/AI/evaluateInput",
-      requestStream: false,
-      responseStream: false,
-      requestSerialize: (message: dependency_4.InputEvaluationRequest) =>
-        Buffer.from(message.serialize()),
-      requestDeserialize: (bytes: Buffer) =>
-        dependency_4.InputEvaluationRequest.deserialize(new Uint8Array(bytes)),
-      responseSerialize: (message: dependency_4.Evaluation) =>
-        Buffer.from(message.serialize()),
-      responseDeserialize: (bytes: Buffer) =>
-        dependency_4.Evaluation.deserialize(new Uint8Array(bytes)),
-    },
-    generateResponse: {
-      path: "/AI/generateResponse",
-      requestStream: false,
-      responseStream: false,
-      requestSerialize: (message: dependency_4.ResponseGenerationRequest) =>
-        Buffer.from(message.serialize()),
-      requestDeserialize: (bytes: Buffer) =>
-        dependency_4.ResponseGenerationRequest.deserialize(
-          new Uint8Array(bytes),
-        ),
-      responseSerialize: (message: dependency_4.MessageGenerationResult) =>
-        Buffer.from(message.serialize()),
-      responseDeserialize: (bytes: Buffer) =>
-        dependency_4.MessageGenerationResult.deserialize(new Uint8Array(bytes)),
-    },
-    evaluateOutput: {
-      path: "/AI/evaluateOutput",
-      requestStream: false,
-      responseStream: false,
-      requestSerialize: (message: dependency_4.OutputEvaluationRequest) =>
-        Buffer.from(message.serialize()),
-      requestDeserialize: (bytes: Buffer) =>
-        dependency_4.OutputEvaluationRequest.deserialize(new Uint8Array(bytes)),
-      responseSerialize: (message: dependency_4.Evaluation) =>
-        Buffer.from(message.serialize()),
-      responseDeserialize: (bytes: Buffer) =>
-        dependency_4.Evaluation.deserialize(new Uint8Array(bytes)),
-    },
-    regenerateResponse: {
-      path: "/AI/regenerateResponse",
-      requestStream: false,
-      responseStream: false,
-      requestSerialize: (message: dependency_4.ResponseGenerationRequest) =>
-        Buffer.from(message.serialize()),
-      requestDeserialize: (bytes: Buffer) =>
-        dependency_4.ResponseGenerationRequest.deserialize(
-          new Uint8Array(bytes),
-        ),
-      responseSerialize: (message: dependency_4.MessageGenerationResult) =>
-        Buffer.from(message.serialize()),
-      responseDeserialize: (bytes: Buffer) =>
-        dependency_4.MessageGenerationResult.deserialize(new Uint8Array(bytes)),
-    },
-    getFiles: {
-      path: "/AI/getFiles",
-      requestStream: false,
-      responseStream: false,
-      requestSerialize: (message: dependency_1.Empty) =>
-        Buffer.from(message.serialize()),
-      requestDeserialize: (bytes: Buffer) =>
-        dependency_1.Empty.deserialize(new Uint8Array(bytes)),
-      responseSerialize: (message: dependency_3.FilesList) =>
-        Buffer.from(message.serialize()),
-      responseDeserialize: (bytes: Buffer) =>
-        dependency_3.FilesList.deserialize(new Uint8Array(bytes)),
-    },
-    addFile: {
-      path: "/AI/addFile",
-      requestStream: false,
-      responseStream: false,
-      requestSerialize: (message: dependency_3.FileUploadRequest) =>
-        Buffer.from(message.serialize()),
-      requestDeserialize: (bytes: Buffer) =>
-        dependency_3.FileUploadRequest.deserialize(new Uint8Array(bytes)),
-      responseSerialize: (message: dependency_1.Empty) =>
-        Buffer.from(message.serialize()),
-      responseDeserialize: (bytes: Buffer) =>
-        dependency_1.Empty.deserialize(new Uint8Array(bytes)),
-    },
-    deleteFile: {
-      path: "/AI/deleteFile",
-      requestStream: false,
-      responseStream: false,
-      requestSerialize: (message: dependency_3.FileName) =>
-        Buffer.from(message.serialize()),
-      requestDeserialize: (bytes: Buffer) =>
-        dependency_3.FileName.deserialize(new Uint8Array(bytes)),
-      responseSerialize: (message: dependency_1.Empty) =>
-        Buffer.from(message.serialize()),
-      responseDeserialize: (bytes: Buffer) =>
-        dependency_1.Empty.deserialize(new Uint8Array(bytes)),
-    },
-    getPrompt: {
-      path: "/AI/getPrompt",
-      requestStream: false,
-      responseStream: false,
-      requestSerialize: (message: dependency_1.Empty) =>
-        Buffer.from(message.serialize()),
-      requestDeserialize: (bytes: Buffer) =>
-        dependency_1.Empty.deserialize(new Uint8Array(bytes)),
-      responseSerialize: (message: dependency_2.Prompt) =>
-        Buffer.from(message.serialize()),
-      responseDeserialize: (bytes: Buffer) =>
-        dependency_2.Prompt.deserialize(new Uint8Array(bytes)),
-    },
-    editPrompt: {
-      path: "/AI/editPrompt",
-      requestStream: false,
-      responseStream: false,
-      requestSerialize: (message: dependency_2.Prompt) =>
-        Buffer.from(message.serialize()),
-      requestDeserialize: (bytes: Buffer) =>
-        dependency_2.Prompt.deserialize(new Uint8Array(bytes)),
-      responseSerialize: (message: dependency_1.Empty) =>
-        Buffer.from(message.serialize()),
-      responseDeserialize: (bytes: Buffer) =>
-        dependency_1.Empty.deserialize(new Uint8Array(bytes)),
-    },
-    getModel: {
-      path: "/AI/getModel",
-      requestStream: false,
-      responseStream: false,
-      requestSerialize: (message: dependency_1.Empty) =>
-        Buffer.from(message.serialize()),
-      requestDeserialize: (bytes: Buffer) =>
-        dependency_1.Empty.deserialize(new Uint8Array(bytes)),
-      responseSerialize: (message: dependency_2.Model) =>
-        Buffer.from(message.serialize()),
-      responseDeserialize: (bytes: Buffer) =>
-        dependency_2.Model.deserialize(new Uint8Array(bytes)),
-    },
-    editModel: {
-      path: "/AI/editModel",
-      requestStream: false,
-      responseStream: false,
-      requestSerialize: (message: dependency_2.Model) =>
-        Buffer.from(message.serialize()),
-      requestDeserialize: (bytes: Buffer) =>
-        dependency_2.Model.deserialize(new Uint8Array(bytes)),
-      responseSerialize: (message: dependency_1.Empty) =>
-        Buffer.from(message.serialize()),
-      responseDeserialize: (bytes: Buffer) =>
-        dependency_1.Empty.deserialize(new Uint8Array(bytes)),
-    },
-  };
-  [method: string]: grpc_1.UntypedHandleCall;
-  abstract generateFirstMessage(
-    call: grpc_1.ServerUnaryCall<
-      dependency_4.FirstMessageGenerationRequest,
-      dependency_4.MessageGenerationResult
-    >,
-    callback: grpc_1.sendUnaryData<dependency_4.MessageGenerationResult>,
-  ): void;
-  abstract evaluateInput(
-    call: grpc_1.ServerUnaryCall<
-      dependency_4.InputEvaluationRequest,
-      dependency_4.Evaluation
-    >,
-    callback: grpc_1.sendUnaryData<dependency_4.Evaluation>,
-  ): void;
-  abstract generateResponse(
-    call: grpc_1.ServerUnaryCall<
-      dependency_4.ResponseGenerationRequest,
-      dependency_4.MessageGenerationResult
-    >,
-    callback: grpc_1.sendUnaryData<dependency_4.MessageGenerationResult>,
-  ): void;
-  abstract evaluateOutput(
-    call: grpc_1.ServerUnaryCall<
-      dependency_4.OutputEvaluationRequest,
-      dependency_4.Evaluation
-    >,
-    callback: grpc_1.sendUnaryData<dependency_4.Evaluation>,
-  ): void;
-  abstract regenerateResponse(
-    call: grpc_1.ServerUnaryCall<
-      dependency_4.ResponseGenerationRequest,
-      dependency_4.MessageGenerationResult
-    >,
-    callback: grpc_1.sendUnaryData<dependency_4.MessageGenerationResult>,
-  ): void;
-  abstract getFiles(
-    call: grpc_1.ServerUnaryCall<dependency_1.Empty, dependency_3.FilesList>,
-    callback: grpc_1.sendUnaryData<dependency_3.FilesList>,
-  ): void;
-  abstract addFile(
-    call: grpc_1.ServerUnaryCall<
-      dependency_3.FileUploadRequest,
-      dependency_1.Empty
-    >,
-    callback: grpc_1.sendUnaryData<dependency_1.Empty>,
-  ): void;
-  abstract deleteFile(
-    call: grpc_1.ServerUnaryCall<dependency_3.FileName, dependency_1.Empty>,
-    callback: grpc_1.sendUnaryData<dependency_1.Empty>,
-  ): void;
-  abstract getPrompt(
-    call: grpc_1.ServerUnaryCall<dependency_1.Empty, dependency_2.Prompt>,
-    callback: grpc_1.sendUnaryData<dependency_2.Prompt>,
-  ): void;
-  abstract editPrompt(
-    call: grpc_1.ServerUnaryCall<dependency_2.Prompt, dependency_1.Empty>,
-    callback: grpc_1.sendUnaryData<dependency_1.Empty>,
-  ): void;
-  abstract getModel(
-    call: grpc_1.ServerUnaryCall<dependency_1.Empty, dependency_2.Model>,
-    callback: grpc_1.sendUnaryData<dependency_2.Model>,
-  ): void;
-  abstract editModel(
-    call: grpc_1.ServerUnaryCall<dependency_2.Model, dependency_1.Empty>,
-    callback: grpc_1.sendUnaryData<dependency_1.Empty>,
-  ): void;
+    static definition = {
+        generateFirstMessage: {
+            path: "/AI/generateFirstMessage",
+            requestStream: false,
+            responseStream: false,
+            requestSerialize: (message: UserData) => Buffer.from(message.serialize()),
+            requestDeserialize: (bytes: Buffer) => UserData.deserialize(new Uint8Array(bytes)),
+            responseSerialize: (message: FirstMessage) => Buffer.from(message.serialize()),
+            responseDeserialize: (bytes: Buffer) => FirstMessage.deserialize(new Uint8Array(bytes))
+        },
+        respond: {
+            path: "/AI/respond",
+            requestStream: false,
+            responseStream: false,
+            requestSerialize: (message: UserMessage) => Buffer.from(message.serialize()),
+            requestDeserialize: (bytes: Buffer) => UserMessage.deserialize(new Uint8Array(bytes)),
+            responseSerialize: (message: ResponseData) => Buffer.from(message.serialize()),
+            responseDeserialize: (bytes: Buffer) => ResponseData.deserialize(new Uint8Array(bytes))
+        },
+        generateHeatMessage: {
+            path: "/AI/generateHeatMessage",
+            requestStream: false,
+            responseStream: false,
+            requestSerialize: (message: DialogueData) => Buffer.from(message.serialize()),
+            requestDeserialize: (bytes: Buffer) => DialogueData.deserialize(new Uint8Array(bytes)),
+            responseSerialize: (message: FirstMessage) => Buffer.from(message.serialize()),
+            responseDeserialize: (bytes: Buffer) => FirstMessage.deserialize(new Uint8Array(bytes))
+        },
+        getFiles: {
+            path: "/AI/getFiles",
+            requestStream: false,
+            responseStream: false,
+            requestSerialize: (message: dependency_1.Empty) => Buffer.from(message.serialize()),
+            requestDeserialize: (bytes: Buffer) => dependency_1.Empty.deserialize(new Uint8Array(bytes)),
+            responseSerialize: (message: dependency_3.FilesList) => Buffer.from(message.serialize()),
+            responseDeserialize: (bytes: Buffer) => dependency_3.FilesList.deserialize(new Uint8Array(bytes))
+        },
+        addFile: {
+            path: "/AI/addFile",
+            requestStream: false,
+            responseStream: false,
+            requestSerialize: (message: dependency_3.FileUploadRequest) => Buffer.from(message.serialize()),
+            requestDeserialize: (bytes: Buffer) => dependency_3.FileUploadRequest.deserialize(new Uint8Array(bytes)),
+            responseSerialize: (message: dependency_1.Empty) => Buffer.from(message.serialize()),
+            responseDeserialize: (bytes: Buffer) => dependency_1.Empty.deserialize(new Uint8Array(bytes))
+        },
+        deleteFile: {
+            path: "/AI/deleteFile",
+            requestStream: false,
+            responseStream: false,
+            requestSerialize: (message: dependency_3.FileName) => Buffer.from(message.serialize()),
+            requestDeserialize: (bytes: Buffer) => dependency_3.FileName.deserialize(new Uint8Array(bytes)),
+            responseSerialize: (message: dependency_1.Empty) => Buffer.from(message.serialize()),
+            responseDeserialize: (bytes: Buffer) => dependency_1.Empty.deserialize(new Uint8Array(bytes))
+        },
+        getPrompt: {
+            path: "/AI/getPrompt",
+            requestStream: false,
+            responseStream: false,
+            requestSerialize: (message: dependency_1.Empty) => Buffer.from(message.serialize()),
+            requestDeserialize: (bytes: Buffer) => dependency_1.Empty.deserialize(new Uint8Array(bytes)),
+            responseSerialize: (message: dependency_2.Prompt) => Buffer.from(message.serialize()),
+            responseDeserialize: (bytes: Buffer) => dependency_2.Prompt.deserialize(new Uint8Array(bytes))
+        },
+        editPrompt: {
+            path: "/AI/editPrompt",
+            requestStream: false,
+            responseStream: false,
+            requestSerialize: (message: dependency_2.Prompt) => Buffer.from(message.serialize()),
+            requestDeserialize: (bytes: Buffer) => dependency_2.Prompt.deserialize(new Uint8Array(bytes)),
+            responseSerialize: (message: dependency_1.Empty) => Buffer.from(message.serialize()),
+            responseDeserialize: (bytes: Buffer) => dependency_1.Empty.deserialize(new Uint8Array(bytes))
+        },
+        getModel: {
+            path: "/AI/getModel",
+            requestStream: false,
+            responseStream: false,
+            requestSerialize: (message: dependency_1.Empty) => Buffer.from(message.serialize()),
+            requestDeserialize: (bytes: Buffer) => dependency_1.Empty.deserialize(new Uint8Array(bytes)),
+            responseSerialize: (message: dependency_2.Model) => Buffer.from(message.serialize()),
+            responseDeserialize: (bytes: Buffer) => dependency_2.Model.deserialize(new Uint8Array(bytes))
+        },
+        editModel: {
+            path: "/AI/editModel",
+            requestStream: false,
+            responseStream: false,
+            requestSerialize: (message: dependency_2.Model) => Buffer.from(message.serialize()),
+            requestDeserialize: (bytes: Buffer) => dependency_2.Model.deserialize(new Uint8Array(bytes)),
+            responseSerialize: (message: dependency_1.Empty) => Buffer.from(message.serialize()),
+            responseDeserialize: (bytes: Buffer) => dependency_1.Empty.deserialize(new Uint8Array(bytes))
+        },
+        getFilterValue: {
+            path: "/AI/getFilterValue",
+            requestStream: false,
+            responseStream: false,
+            requestSerialize: (message: dependency_1.Empty) => Buffer.from(message.serialize()),
+            requestDeserialize: (bytes: Buffer) => dependency_1.Empty.deserialize(new Uint8Array(bytes)),
+            responseSerialize: (message: FilterValue) => Buffer.from(message.serialize()),
+            responseDeserialize: (bytes: Buffer) => FilterValue.deserialize(new Uint8Array(bytes))
+        },
+        setFilterValue: {
+            path: "/AI/setFilterValue",
+            requestStream: false,
+            responseStream: false,
+            requestSerialize: (message: FilterValue) => Buffer.from(message.serialize()),
+            requestDeserialize: (bytes: Buffer) => FilterValue.deserialize(new Uint8Array(bytes)),
+            responseSerialize: (message: dependency_1.Empty) => Buffer.from(message.serialize()),
+            responseDeserialize: (bytes: Buffer) => dependency_1.Empty.deserialize(new Uint8Array(bytes))
+        }
+    };
+    [method: string]: grpc_1.UntypedHandleCall;
+    abstract generateFirstMessage(call: grpc_1.ServerUnaryCall<UserData, FirstMessage>, callback: grpc_1.sendUnaryData<FirstMessage>): void;
+    abstract respond(call: grpc_1.ServerUnaryCall<UserMessage, ResponseData>, callback: grpc_1.sendUnaryData<ResponseData>): void;
+    abstract generateHeatMessage(call: grpc_1.ServerUnaryCall<DialogueData, FirstMessage>, callback: grpc_1.sendUnaryData<FirstMessage>): void;
+    abstract getFiles(call: grpc_1.ServerUnaryCall<dependency_1.Empty, dependency_3.FilesList>, callback: grpc_1.sendUnaryData<dependency_3.FilesList>): void;
+    abstract addFile(call: grpc_1.ServerUnaryCall<dependency_3.FileUploadRequest, dependency_1.Empty>, callback: grpc_1.sendUnaryData<dependency_1.Empty>): void;
+    abstract deleteFile(call: grpc_1.ServerUnaryCall<dependency_3.FileName, dependency_1.Empty>, callback: grpc_1.sendUnaryData<dependency_1.Empty>): void;
+    abstract getPrompt(call: grpc_1.ServerUnaryCall<dependency_1.Empty, dependency_2.Prompt>, callback: grpc_1.sendUnaryData<dependency_2.Prompt>): void;
+    abstract editPrompt(call: grpc_1.ServerUnaryCall<dependency_2.Prompt, dependency_1.Empty>, callback: grpc_1.sendUnaryData<dependency_1.Empty>): void;
+    abstract getModel(call: grpc_1.ServerUnaryCall<dependency_1.Empty, dependency_2.Model>, callback: grpc_1.sendUnaryData<dependency_2.Model>): void;
+    abstract editModel(call: grpc_1.ServerUnaryCall<dependency_2.Model, dependency_1.Empty>, callback: grpc_1.sendUnaryData<dependency_1.Empty>): void;
+    abstract getFilterValue(call: grpc_1.ServerUnaryCall<dependency_1.Empty, FilterValue>, callback: grpc_1.sendUnaryData<FilterValue>): void;
+    abstract setFilterValue(call: grpc_1.ServerUnaryCall<FilterValue, dependency_1.Empty>, callback: grpc_1.sendUnaryData<dependency_1.Empty>): void;
 }
-export class AIClient extends grpc_1.makeGenericClientConstructor(
-  UnimplementedAIService.definition,
-  "AI",
-  {},
-) {
-  constructor(
-    address: string,
-    credentials: grpc_1.ChannelCredentials,
-    options?: Partial<grpc_1.ChannelOptions>,
-  ) {
-    super(address, credentials, options);
-  }
-  generateFirstMessage: GrpcPromiseServiceInterface<
-    dependency_4.FirstMessageGenerationRequest,
-    dependency_4.MessageGenerationResult
-  > = (
-    message: dependency_4.FirstMessageGenerationRequest,
-    metadata?: grpc_1.Metadata | grpc_1.CallOptions,
-    options?: grpc_1.CallOptions,
-  ): Promise<dependency_4.MessageGenerationResult> => {
-    if (!metadata) {
-      metadata = new grpc_1.Metadata();
+export class AIClient extends grpc_1.makeGenericClientConstructor(UnimplementedAIService.definition, "AI", {}) {
+    constructor(address: string, credentials: grpc_1.ChannelCredentials, options?: Partial<grpc_1.ChannelOptions>) {
+        super(address, credentials, options);
     }
-    if (!options) {
-      options = {};
-    }
-    return new Promise((resolve, reject) =>
-      super.generateFirstMessage(
-        message,
-        metadata,
-        options,
-        (
-          error: grpc_1.ServiceError,
-          response: dependency_4.MessageGenerationResult,
-        ) => {
-          if (error) {
+    generateFirstMessage: GrpcPromiseServiceInterface<UserData, FirstMessage> = (message: UserData, metadata?: grpc_1.Metadata | grpc_1.CallOptions, options?: grpc_1.CallOptions): Promise<FirstMessage> => { if (!metadata) {
+        metadata = new grpc_1.Metadata;
+    } if (!options) {
+        options = {};
+    } return new Promise((resolve, reject) => super.generateFirstMessage(message, metadata, options, (error: grpc_1.ServiceError, response: FirstMessage) => {
+        if (error) {
             reject(error);
-          } else {
+        }
+        else {
             resolve(response);
-          }
-        },
-      ),
-    );
-  };
-  evaluateInput: GrpcPromiseServiceInterface<
-    dependency_4.InputEvaluationRequest,
-    dependency_4.Evaluation
-  > = (
-    message: dependency_4.InputEvaluationRequest,
-    metadata?: grpc_1.Metadata | grpc_1.CallOptions,
-    options?: grpc_1.CallOptions,
-  ): Promise<dependency_4.Evaluation> => {
-    if (!metadata) {
-      metadata = new grpc_1.Metadata();
-    }
-    if (!options) {
-      options = {};
-    }
-    return new Promise((resolve, reject) =>
-      super.evaluateInput(
-        message,
-        metadata,
-        options,
-        (error: grpc_1.ServiceError, response: dependency_4.Evaluation) => {
-          if (error) {
+        }
+    })); };
+    respond: GrpcPromiseServiceInterface<UserMessage, ResponseData> = (message: UserMessage, metadata?: grpc_1.Metadata | grpc_1.CallOptions, options?: grpc_1.CallOptions): Promise<ResponseData> => { if (!metadata) {
+        metadata = new grpc_1.Metadata;
+    } if (!options) {
+        options = {};
+    } return new Promise((resolve, reject) => super.respond(message, metadata, options, (error: grpc_1.ServiceError, response: ResponseData) => {
+        if (error) {
             reject(error);
-          } else {
+        }
+        else {
             resolve(response);
-          }
-        },
-      ),
-    );
-  };
-  generateResponse: GrpcPromiseServiceInterface<
-    dependency_4.ResponseGenerationRequest,
-    dependency_4.MessageGenerationResult
-  > = (
-    message: dependency_4.ResponseGenerationRequest,
-    metadata?: grpc_1.Metadata | grpc_1.CallOptions,
-    options?: grpc_1.CallOptions,
-  ): Promise<dependency_4.MessageGenerationResult> => {
-    if (!metadata) {
-      metadata = new grpc_1.Metadata();
-    }
-    if (!options) {
-      options = {};
-    }
-    return new Promise((resolve, reject) =>
-      super.generateResponse(
-        message,
-        metadata,
-        options,
-        (
-          error: grpc_1.ServiceError,
-          response: dependency_4.MessageGenerationResult,
-        ) => {
-          if (error) {
+        }
+    })); };
+    generateHeatMessage: GrpcPromiseServiceInterface<DialogueData, FirstMessage> = (message: DialogueData, metadata?: grpc_1.Metadata | grpc_1.CallOptions, options?: grpc_1.CallOptions): Promise<FirstMessage> => { if (!metadata) {
+        metadata = new grpc_1.Metadata;
+    } if (!options) {
+        options = {};
+    } return new Promise((resolve, reject) => super.generateHeatMessage(message, metadata, options, (error: grpc_1.ServiceError, response: FirstMessage) => {
+        if (error) {
             reject(error);
-          } else {
+        }
+        else {
             resolve(response);
-          }
-        },
-      ),
-    );
-  };
-  evaluateOutput: GrpcPromiseServiceInterface<
-    dependency_4.OutputEvaluationRequest,
-    dependency_4.Evaluation
-  > = (
-    message: dependency_4.OutputEvaluationRequest,
-    metadata?: grpc_1.Metadata | grpc_1.CallOptions,
-    options?: grpc_1.CallOptions,
-  ): Promise<dependency_4.Evaluation> => {
-    if (!metadata) {
-      metadata = new grpc_1.Metadata();
-    }
-    if (!options) {
-      options = {};
-    }
-    return new Promise((resolve, reject) =>
-      super.evaluateOutput(
-        message,
-        metadata,
-        options,
-        (error: grpc_1.ServiceError, response: dependency_4.Evaluation) => {
-          if (error) {
+        }
+    })); };
+    getFiles: GrpcPromiseServiceInterface<dependency_1.Empty, dependency_3.FilesList> = (message: dependency_1.Empty, metadata?: grpc_1.Metadata | grpc_1.CallOptions, options?: grpc_1.CallOptions): Promise<dependency_3.FilesList> => { if (!metadata) {
+        metadata = new grpc_1.Metadata;
+    } if (!options) {
+        options = {};
+    } return new Promise((resolve, reject) => super.getFiles(message, metadata, options, (error: grpc_1.ServiceError, response: dependency_3.FilesList) => {
+        if (error) {
             reject(error);
-          } else {
+        }
+        else {
             resolve(response);
-          }
-        },
-      ),
-    );
-  };
-  regenerateResponse: GrpcPromiseServiceInterface<
-    dependency_4.ResponseGenerationRequest,
-    dependency_4.MessageGenerationResult
-  > = (
-    message: dependency_4.ResponseGenerationRequest,
-    metadata?: grpc_1.Metadata | grpc_1.CallOptions,
-    options?: grpc_1.CallOptions,
-  ): Promise<dependency_4.MessageGenerationResult> => {
-    if (!metadata) {
-      metadata = new grpc_1.Metadata();
-    }
-    if (!options) {
-      options = {};
-    }
-    return new Promise((resolve, reject) =>
-      super.regenerateResponse(
-        message,
-        metadata,
-        options,
-        (
-          error: grpc_1.ServiceError,
-          response: dependency_4.MessageGenerationResult,
-        ) => {
-          if (error) {
+        }
+    })); };
+    addFile: GrpcPromiseServiceInterface<dependency_3.FileUploadRequest, dependency_1.Empty> = (message: dependency_3.FileUploadRequest, metadata?: grpc_1.Metadata | grpc_1.CallOptions, options?: grpc_1.CallOptions): Promise<dependency_1.Empty> => { if (!metadata) {
+        metadata = new grpc_1.Metadata;
+    } if (!options) {
+        options = {};
+    } return new Promise((resolve, reject) => super.addFile(message, metadata, options, (error: grpc_1.ServiceError, response: dependency_1.Empty) => {
+        if (error) {
             reject(error);
-          } else {
+        }
+        else {
             resolve(response);
-          }
-        },
-      ),
-    );
-  };
-  getFiles: GrpcPromiseServiceInterface<
-    dependency_1.Empty,
-    dependency_3.FilesList
-  > = (
-    message: dependency_1.Empty,
-    metadata?: grpc_1.Metadata | grpc_1.CallOptions,
-    options?: grpc_1.CallOptions,
-  ): Promise<dependency_3.FilesList> => {
-    if (!metadata) {
-      metadata = new grpc_1.Metadata();
-    }
-    if (!options) {
-      options = {};
-    }
-    return new Promise((resolve, reject) =>
-      super.getFiles(
-        message,
-        metadata,
-        options,
-        (error: grpc_1.ServiceError, response: dependency_3.FilesList) => {
-          if (error) {
+        }
+    })); };
+    deleteFile: GrpcPromiseServiceInterface<dependency_3.FileName, dependency_1.Empty> = (message: dependency_3.FileName, metadata?: grpc_1.Metadata | grpc_1.CallOptions, options?: grpc_1.CallOptions): Promise<dependency_1.Empty> => { if (!metadata) {
+        metadata = new grpc_1.Metadata;
+    } if (!options) {
+        options = {};
+    } return new Promise((resolve, reject) => super.deleteFile(message, metadata, options, (error: grpc_1.ServiceError, response: dependency_1.Empty) => {
+        if (error) {
             reject(error);
-          } else {
+        }
+        else {
             resolve(response);
-          }
-        },
-      ),
-    );
-  };
-  addFile: GrpcPromiseServiceInterface<
-    dependency_3.FileUploadRequest,
-    dependency_1.Empty
-  > = (
-    message: dependency_3.FileUploadRequest,
-    metadata?: grpc_1.Metadata | grpc_1.CallOptions,
-    options?: grpc_1.CallOptions,
-  ): Promise<dependency_1.Empty> => {
-    if (!metadata) {
-      metadata = new grpc_1.Metadata();
-    }
-    if (!options) {
-      options = {};
-    }
-    return new Promise((resolve, reject) =>
-      super.addFile(
-        message,
-        metadata,
-        options,
-        (error: grpc_1.ServiceError, response: dependency_1.Empty) => {
-          if (error) {
+        }
+    })); };
+    getPrompt: GrpcPromiseServiceInterface<dependency_1.Empty, dependency_2.Prompt> = (message: dependency_1.Empty, metadata?: grpc_1.Metadata | grpc_1.CallOptions, options?: grpc_1.CallOptions): Promise<dependency_2.Prompt> => { if (!metadata) {
+        metadata = new grpc_1.Metadata;
+    } if (!options) {
+        options = {};
+    } return new Promise((resolve, reject) => super.getPrompt(message, metadata, options, (error: grpc_1.ServiceError, response: dependency_2.Prompt) => {
+        if (error) {
             reject(error);
-          } else {
+        }
+        else {
             resolve(response);
-          }
-        },
-      ),
-    );
-  };
-  deleteFile: GrpcPromiseServiceInterface<
-    dependency_3.FileName,
-    dependency_1.Empty
-  > = (
-    message: dependency_3.FileName,
-    metadata?: grpc_1.Metadata | grpc_1.CallOptions,
-    options?: grpc_1.CallOptions,
-  ): Promise<dependency_1.Empty> => {
-    if (!metadata) {
-      metadata = new grpc_1.Metadata();
-    }
-    if (!options) {
-      options = {};
-    }
-    return new Promise((resolve, reject) =>
-      super.deleteFile(
-        message,
-        metadata,
-        options,
-        (error: grpc_1.ServiceError, response: dependency_1.Empty) => {
-          if (error) {
+        }
+    })); };
+    editPrompt: GrpcPromiseServiceInterface<dependency_2.Prompt, dependency_1.Empty> = (message: dependency_2.Prompt, metadata?: grpc_1.Metadata | grpc_1.CallOptions, options?: grpc_1.CallOptions): Promise<dependency_1.Empty> => { if (!metadata) {
+        metadata = new grpc_1.Metadata;
+    } if (!options) {
+        options = {};
+    } return new Promise((resolve, reject) => super.editPrompt(message, metadata, options, (error: grpc_1.ServiceError, response: dependency_1.Empty) => {
+        if (error) {
             reject(error);
-          } else {
+        }
+        else {
             resolve(response);
-          }
-        },
-      ),
-    );
-  };
-  getPrompt: GrpcPromiseServiceInterface<
-    dependency_1.Empty,
-    dependency_2.Prompt
-  > = (
-    message: dependency_1.Empty,
-    metadata?: grpc_1.Metadata | grpc_1.CallOptions,
-    options?: grpc_1.CallOptions,
-  ): Promise<dependency_2.Prompt> => {
-    if (!metadata) {
-      metadata = new grpc_1.Metadata();
-    }
-    if (!options) {
-      options = {};
-    }
-    return new Promise((resolve, reject) =>
-      super.getPrompt(
-        message,
-        metadata,
-        options,
-        (error: grpc_1.ServiceError, response: dependency_2.Prompt) => {
-          if (error) {
+        }
+    })); };
+    getModel: GrpcPromiseServiceInterface<dependency_1.Empty, dependency_2.Model> = (message: dependency_1.Empty, metadata?: grpc_1.Metadata | grpc_1.CallOptions, options?: grpc_1.CallOptions): Promise<dependency_2.Model> => { if (!metadata) {
+        metadata = new grpc_1.Metadata;
+    } if (!options) {
+        options = {};
+    } return new Promise((resolve, reject) => super.getModel(message, metadata, options, (error: grpc_1.ServiceError, response: dependency_2.Model) => {
+        if (error) {
             reject(error);
-          } else {
+        }
+        else {
             resolve(response);
-          }
-        },
-      ),
-    );
-  };
-  editPrompt: GrpcPromiseServiceInterface<
-    dependency_2.Prompt,
-    dependency_1.Empty
-  > = (
-    message: dependency_2.Prompt,
-    metadata?: grpc_1.Metadata | grpc_1.CallOptions,
-    options?: grpc_1.CallOptions,
-  ): Promise<dependency_1.Empty> => {
-    if (!metadata) {
-      metadata = new grpc_1.Metadata();
-    }
-    if (!options) {
-      options = {};
-    }
-    return new Promise((resolve, reject) =>
-      super.editPrompt(
-        message,
-        metadata,
-        options,
-        (error: grpc_1.ServiceError, response: dependency_1.Empty) => {
-          if (error) {
+        }
+    })); };
+    editModel: GrpcPromiseServiceInterface<dependency_2.Model, dependency_1.Empty> = (message: dependency_2.Model, metadata?: grpc_1.Metadata | grpc_1.CallOptions, options?: grpc_1.CallOptions): Promise<dependency_1.Empty> => { if (!metadata) {
+        metadata = new grpc_1.Metadata;
+    } if (!options) {
+        options = {};
+    } return new Promise((resolve, reject) => super.editModel(message, metadata, options, (error: grpc_1.ServiceError, response: dependency_1.Empty) => {
+        if (error) {
             reject(error);
-          } else {
+        }
+        else {
             resolve(response);
-          }
-        },
-      ),
-    );
-  };
-  getModel: GrpcPromiseServiceInterface<
-    dependency_1.Empty,
-    dependency_2.Model
-  > = (
-    message: dependency_1.Empty,
-    metadata?: grpc_1.Metadata | grpc_1.CallOptions,
-    options?: grpc_1.CallOptions,
-  ): Promise<dependency_2.Model> => {
-    if (!metadata) {
-      metadata = new grpc_1.Metadata();
-    }
-    if (!options) {
-      options = {};
-    }
-    return new Promise((resolve, reject) =>
-      super.getModel(
-        message,
-        metadata,
-        options,
-        (error: grpc_1.ServiceError, response: dependency_2.Model) => {
-          if (error) {
+        }
+    })); };
+    getFilterValue: GrpcPromiseServiceInterface<dependency_1.Empty, FilterValue> = (message: dependency_1.Empty, metadata?: grpc_1.Metadata | grpc_1.CallOptions, options?: grpc_1.CallOptions): Promise<FilterValue> => { if (!metadata) {
+        metadata = new grpc_1.Metadata;
+    } if (!options) {
+        options = {};
+    } return new Promise((resolve, reject) => super.getFilterValue(message, metadata, options, (error: grpc_1.ServiceError, response: FilterValue) => {
+        if (error) {
             reject(error);
-          } else {
+        }
+        else {
             resolve(response);
-          }
-        },
-      ),
-    );
-  };
-  editModel: GrpcPromiseServiceInterface<
-    dependency_2.Model,
-    dependency_1.Empty
-  > = (
-    message: dependency_2.Model,
-    metadata?: grpc_1.Metadata | grpc_1.CallOptions,
-    options?: grpc_1.CallOptions,
-  ): Promise<dependency_1.Empty> => {
-    if (!metadata) {
-      metadata = new grpc_1.Metadata();
-    }
-    if (!options) {
-      options = {};
-    }
-    return new Promise((resolve, reject) =>
-      super.editModel(
-        message,
-        metadata,
-        options,
-        (error: grpc_1.ServiceError, response: dependency_1.Empty) => {
-          if (error) {
+        }
+    })); };
+    setFilterValue: GrpcPromiseServiceInterface<FilterValue, dependency_1.Empty> = (message: FilterValue, metadata?: grpc_1.Metadata | grpc_1.CallOptions, options?: grpc_1.CallOptions): Promise<dependency_1.Empty> => { if (!metadata) {
+        metadata = new grpc_1.Metadata;
+    } if (!options) {
+        options = {};
+    } return new Promise((resolve, reject) => super.setFilterValue(message, metadata, options, (error: grpc_1.ServiceError, response: dependency_1.Empty) => {
+        if (error) {
             reject(error);
-          } else {
+        }
+        else {
             resolve(response);
-          }
-        },
-      ),
-    );
-  };
+        }
+    })); };
 }

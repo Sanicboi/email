@@ -3,14 +3,12 @@ syntax = "proto3";
 import "shared.proto";
 import "configuration.proto";
 import "files.proto";
-import "generation.proto";
 
 service AI {
-    rpc generateFirstMessage(FirstMessageGenerationRequest) returns (MessageGenerationResult);
-    rpc evaluateInput(InputEvaluationRequest) returns (Evaluation);
-    rpc generateResponse(ResponseGenerationRequest) returns (MessageGenerationResult);
-    rpc evaluateOutput(OutputEvaluationRequest) returns (Evaluation);
-    rpc regenerateResponse(ResponseGenerationRequest) returns (MessageGenerationResult);
+
+    rpc generateFirstMessage(UserData) returns (FirstMessage);
+    rpc respond(UserMessage) returns (ResponseData);
+    rpc generateHeatMessage(DialogueData) returns (FirstMessage);
 
 
     rpc getFiles(Empty) returns (FilesList);
@@ -21,4 +19,48 @@ service AI {
     rpc editPrompt(Prompt) returns (Empty);
     rpc getModel(Empty) returns (Model);
     rpc editModel(Model) returns (Empty);
+
+    rpc getFilterValue(Empty) returns (FilterValue);
+    rpc setFilterValue(FilterValue) returns (Empty);
+}
+
+
+enum EvaluationStatus {
+    PASS = 0;
+    FAIL = 1;
+}
+
+message FilterValue {
+    int32 value = 1;
+}
+
+message UserData {
+    string data = 1;
+}
+
+message FirstMessage {
+    string id = 1;
+    string text = 2;
+}
+
+message UserMessage {
+    string text = 1;
+    string id = 2;
+}
+
+message ResponseData {
+    EvaluationStatus status = 1;
+    string evaluationComment = 2;
+    int32 importance = 3;
+    int32 enthusiasm = 4;
+    bool delayed = 5;
+    string delayDate = 6;
+    optional string response = 7;
+    optional int32 responseRating = 8;
+    optional string responseComment = 9;
+    optional string responseId = 10;
+}
+
+message DialogueData {
+    string id = 1;
 }

@@ -5,280 +5,226 @@
  * git: https://github.com/thesayyn/protoc-gen-ts */
 import * as pb_1 from "google-protobuf";
 export class FileName extends pb_1.Message {
-  #one_of_decls: number[][] = [];
-  constructor(
-    data?:
-      | any[]
-      | {
-          name?: string;
-        },
-  ) {
-    super();
-    pb_1.Message.initialize(
-      this,
-      Array.isArray(data) ? data : [],
-      0,
-      -1,
-      [],
-      this.#one_of_decls,
-    );
-    if (!Array.isArray(data) && typeof data == "object") {
-      if ("name" in data && data.name != undefined) {
-        this.name = data.name;
-      }
+    #one_of_decls: number[][] = [];
+    constructor(data?: any[] | {
+        name?: string;
+    }) {
+        super();
+        pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+        if (!Array.isArray(data) && typeof data == "object") {
+            if ("name" in data && data.name != undefined) {
+                this.name = data.name;
+            }
+        }
     }
-  }
-  get name() {
-    return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
-  }
-  set name(value: string) {
-    pb_1.Message.setField(this, 1, value);
-  }
-  static fromObject(data: { name?: string }): FileName {
-    const message = new FileName({});
-    if (data.name != null) {
-      message.name = data.name;
+    get name() {
+        return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
     }
-    return message;
-  }
-  toObject() {
-    const data: {
-      name?: string;
-    } = {};
-    if (this.name != null) {
-      data.name = this.name;
+    set name(value: string) {
+        pb_1.Message.setField(this, 1, value);
     }
-    return data;
-  }
-  serialize(): Uint8Array;
-  serialize(w: pb_1.BinaryWriter): void;
-  serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
-    const writer = w || new pb_1.BinaryWriter();
-    if (this.name.length) writer.writeString(1, this.name);
-    if (!w) return writer.getResultBuffer();
-  }
-  static deserialize(bytes: Uint8Array | pb_1.BinaryReader): FileName {
-    const reader =
-        bytes instanceof pb_1.BinaryReader
-          ? bytes
-          : new pb_1.BinaryReader(bytes),
-      message = new FileName();
-    while (reader.nextField()) {
-      if (reader.isEndGroup()) break;
-      switch (reader.getFieldNumber()) {
-        case 1:
-          message.name = reader.readString();
-          break;
-        default:
-          reader.skipField();
-      }
+    static fromObject(data: {
+        name?: string;
+    }): FileName {
+        const message = new FileName({});
+        if (data.name != null) {
+            message.name = data.name;
+        }
+        return message;
     }
-    return message;
-  }
-  serializeBinary(): Uint8Array {
-    return this.serialize();
-  }
-  static deserializeBinary(bytes: Uint8Array): FileName {
-    return FileName.deserialize(bytes);
-  }
+    toObject() {
+        const data: {
+            name?: string;
+        } = {};
+        if (this.name != null) {
+            data.name = this.name;
+        }
+        return data;
+    }
+    serialize(): Uint8Array;
+    serialize(w: pb_1.BinaryWriter): void;
+    serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+        const writer = w || new pb_1.BinaryWriter();
+        if (this.name.length)
+            writer.writeString(1, this.name);
+        if (!w)
+            return writer.getResultBuffer();
+    }
+    static deserialize(bytes: Uint8Array | pb_1.BinaryReader): FileName {
+        const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new FileName();
+        while (reader.nextField()) {
+            if (reader.isEndGroup())
+                break;
+            switch (reader.getFieldNumber()) {
+                case 1:
+                    message.name = reader.readString();
+                    break;
+                default: reader.skipField();
+            }
+        }
+        return message;
+    }
+    serializeBinary(): Uint8Array {
+        return this.serialize();
+    }
+    static deserializeBinary(bytes: Uint8Array): FileName {
+        return FileName.deserialize(bytes);
+    }
 }
 export class FilesList extends pb_1.Message {
-  #one_of_decls: number[][] = [];
-  constructor(
-    data?:
-      | any[]
-      | {
-          names?: FileName[];
-        },
-  ) {
-    super();
-    pb_1.Message.initialize(
-      this,
-      Array.isArray(data) ? data : [],
-      0,
-      -1,
-      [1],
-      this.#one_of_decls,
-    );
-    if (!Array.isArray(data) && typeof data == "object") {
-      if ("names" in data && data.names != undefined) {
-        this.names = data.names;
-      }
+    #one_of_decls: number[][] = [];
+    constructor(data?: any[] | {
+        names?: FileName[];
+    }) {
+        super();
+        pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [1], this.#one_of_decls);
+        if (!Array.isArray(data) && typeof data == "object") {
+            if ("names" in data && data.names != undefined) {
+                this.names = data.names;
+            }
+        }
     }
-  }
-  get names() {
-    return pb_1.Message.getRepeatedWrapperField(
-      this,
-      FileName,
-      1,
-    ) as FileName[];
-  }
-  set names(value: FileName[]) {
-    pb_1.Message.setRepeatedWrapperField(this, 1, value);
-  }
-  static fromObject(data: {
-    names?: ReturnType<typeof FileName.prototype.toObject>[];
-  }): FilesList {
-    const message = new FilesList({});
-    if (data.names != null) {
-      message.names = data.names.map((item) => FileName.fromObject(item));
+    get names() {
+        return pb_1.Message.getRepeatedWrapperField(this, FileName, 1) as FileName[];
     }
-    return message;
-  }
-  toObject() {
-    const data: {
-      names?: ReturnType<typeof FileName.prototype.toObject>[];
-    } = {};
-    if (this.names != null) {
-      data.names = this.names.map((item: FileName) => item.toObject());
+    set names(value: FileName[]) {
+        pb_1.Message.setRepeatedWrapperField(this, 1, value);
     }
-    return data;
-  }
-  serialize(): Uint8Array;
-  serialize(w: pb_1.BinaryWriter): void;
-  serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
-    const writer = w || new pb_1.BinaryWriter();
-    if (this.names.length)
-      writer.writeRepeatedMessage(1, this.names, (item: FileName) =>
-        item.serialize(writer),
-      );
-    if (!w) return writer.getResultBuffer();
-  }
-  static deserialize(bytes: Uint8Array | pb_1.BinaryReader): FilesList {
-    const reader =
-        bytes instanceof pb_1.BinaryReader
-          ? bytes
-          : new pb_1.BinaryReader(bytes),
-      message = new FilesList();
-    while (reader.nextField()) {
-      if (reader.isEndGroup()) break;
-      switch (reader.getFieldNumber()) {
-        case 1:
-          reader.readMessage(message.names, () =>
-            pb_1.Message.addToRepeatedWrapperField(
-              message,
-              1,
-              FileName.deserialize(reader),
-              FileName,
-            ),
-          );
-          break;
-        default:
-          reader.skipField();
-      }
+    static fromObject(data: {
+        names?: ReturnType<typeof FileName.prototype.toObject>[];
+    }): FilesList {
+        const message = new FilesList({});
+        if (data.names != null) {
+            message.names = data.names.map(item => FileName.fromObject(item));
+        }
+        return message;
     }
-    return message;
-  }
-  serializeBinary(): Uint8Array {
-    return this.serialize();
-  }
-  static deserializeBinary(bytes: Uint8Array): FilesList {
-    return FilesList.deserialize(bytes);
-  }
+    toObject() {
+        const data: {
+            names?: ReturnType<typeof FileName.prototype.toObject>[];
+        } = {};
+        if (this.names != null) {
+            data.names = this.names.map((item: FileName) => item.toObject());
+        }
+        return data;
+    }
+    serialize(): Uint8Array;
+    serialize(w: pb_1.BinaryWriter): void;
+    serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+        const writer = w || new pb_1.BinaryWriter();
+        if (this.names.length)
+            writer.writeRepeatedMessage(1, this.names, (item: FileName) => item.serialize(writer));
+        if (!w)
+            return writer.getResultBuffer();
+    }
+    static deserialize(bytes: Uint8Array | pb_1.BinaryReader): FilesList {
+        const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new FilesList();
+        while (reader.nextField()) {
+            if (reader.isEndGroup())
+                break;
+            switch (reader.getFieldNumber()) {
+                case 1:
+                    reader.readMessage(message.names, () => pb_1.Message.addToRepeatedWrapperField(message, 1, FileName.deserialize(reader), FileName));
+                    break;
+                default: reader.skipField();
+            }
+        }
+        return message;
+    }
+    serializeBinary(): Uint8Array {
+        return this.serialize();
+    }
+    static deserializeBinary(bytes: Uint8Array): FilesList {
+        return FilesList.deserialize(bytes);
+    }
 }
 export class FileUploadRequest extends pb_1.Message {
-  #one_of_decls: number[][] = [];
-  constructor(
-    data?:
-      | any[]
-      | {
-          name?: string;
-          content?: Uint8Array;
-        },
-  ) {
-    super();
-    pb_1.Message.initialize(
-      this,
-      Array.isArray(data) ? data : [],
-      0,
-      -1,
-      [],
-      this.#one_of_decls,
-    );
-    if (!Array.isArray(data) && typeof data == "object") {
-      if ("name" in data && data.name != undefined) {
-        this.name = data.name;
-      }
-      if ("content" in data && data.content != undefined) {
-        this.content = data.content;
-      }
+    #one_of_decls: number[][] = [];
+    constructor(data?: any[] | {
+        name?: string;
+        content?: Uint8Array;
+    }) {
+        super();
+        pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+        if (!Array.isArray(data) && typeof data == "object") {
+            if ("name" in data && data.name != undefined) {
+                this.name = data.name;
+            }
+            if ("content" in data && data.content != undefined) {
+                this.content = data.content;
+            }
+        }
     }
-  }
-  get name() {
-    return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
-  }
-  set name(value: string) {
-    pb_1.Message.setField(this, 1, value);
-  }
-  get content() {
-    return pb_1.Message.getFieldWithDefault(
-      this,
-      2,
-      new Uint8Array(0),
-    ) as Uint8Array;
-  }
-  set content(value: Uint8Array) {
-    pb_1.Message.setField(this, 2, value);
-  }
-  static fromObject(data: {
-    name?: string;
-    content?: Uint8Array;
-  }): FileUploadRequest {
-    const message = new FileUploadRequest({});
-    if (data.name != null) {
-      message.name = data.name;
+    get name() {
+        return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
     }
-    if (data.content != null) {
-      message.content = data.content;
+    set name(value: string) {
+        pb_1.Message.setField(this, 1, value);
     }
-    return message;
-  }
-  toObject() {
-    const data: {
-      name?: string;
-      content?: Uint8Array;
-    } = {};
-    if (this.name != null) {
-      data.name = this.name;
+    get content() {
+        return pb_1.Message.getFieldWithDefault(this, 2, new Uint8Array(0)) as Uint8Array;
     }
-    if (this.content != null) {
-      data.content = this.content;
+    set content(value: Uint8Array) {
+        pb_1.Message.setField(this, 2, value);
     }
-    return data;
-  }
-  serialize(): Uint8Array;
-  serialize(w: pb_1.BinaryWriter): void;
-  serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
-    const writer = w || new pb_1.BinaryWriter();
-    if (this.name.length) writer.writeString(1, this.name);
-    if (this.content.length) writer.writeBytes(2, this.content);
-    if (!w) return writer.getResultBuffer();
-  }
-  static deserialize(bytes: Uint8Array | pb_1.BinaryReader): FileUploadRequest {
-    const reader =
-        bytes instanceof pb_1.BinaryReader
-          ? bytes
-          : new pb_1.BinaryReader(bytes),
-      message = new FileUploadRequest();
-    while (reader.nextField()) {
-      if (reader.isEndGroup()) break;
-      switch (reader.getFieldNumber()) {
-        case 1:
-          message.name = reader.readString();
-          break;
-        case 2:
-          message.content = reader.readBytes();
-          break;
-        default:
-          reader.skipField();
-      }
+    static fromObject(data: {
+        name?: string;
+        content?: Uint8Array;
+    }): FileUploadRequest {
+        const message = new FileUploadRequest({});
+        if (data.name != null) {
+            message.name = data.name;
+        }
+        if (data.content != null) {
+            message.content = data.content;
+        }
+        return message;
     }
-    return message;
-  }
-  serializeBinary(): Uint8Array {
-    return this.serialize();
-  }
-  static deserializeBinary(bytes: Uint8Array): FileUploadRequest {
-    return FileUploadRequest.deserialize(bytes);
-  }
+    toObject() {
+        const data: {
+            name?: string;
+            content?: Uint8Array;
+        } = {};
+        if (this.name != null) {
+            data.name = this.name;
+        }
+        if (this.content != null) {
+            data.content = this.content;
+        }
+        return data;
+    }
+    serialize(): Uint8Array;
+    serialize(w: pb_1.BinaryWriter): void;
+    serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+        const writer = w || new pb_1.BinaryWriter();
+        if (this.name.length)
+            writer.writeString(1, this.name);
+        if (this.content.length)
+            writer.writeBytes(2, this.content);
+        if (!w)
+            return writer.getResultBuffer();
+    }
+    static deserialize(bytes: Uint8Array | pb_1.BinaryReader): FileUploadRequest {
+        const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new FileUploadRequest();
+        while (reader.nextField()) {
+            if (reader.isEndGroup())
+                break;
+            switch (reader.getFieldNumber()) {
+                case 1:
+                    message.name = reader.readString();
+                    break;
+                case 2:
+                    message.content = reader.readBytes();
+                    break;
+                default: reader.skipField();
+            }
+        }
+        return message;
+    }
+    serializeBinary(): Uint8Array {
+        return this.serialize();
+    }
+    static deserializeBinary(bytes: Uint8Array): FileUploadRequest {
+        return FileUploadRequest.deserialize(bytes);
+    }
 }

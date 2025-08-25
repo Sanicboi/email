@@ -11,6 +11,7 @@ export type model =
 class AIConfiguration {
   private _prompt: string;
   private _model: model;
+  private _filter: number;
   private _path = path.join(process.cwd(), "data", "ai", "config.json");
 
   public constructor() {}
@@ -43,6 +44,10 @@ class AIConfiguration {
     return this._prompt;
   }
 
+  public get filter(): number {
+    return this._filter;
+  }
+
   public async setModel(m: model): Promise<void> {
     this._model = m;
     await this.save();
@@ -50,6 +55,12 @@ class AIConfiguration {
 
   public async setPrompt(p: string): Promise<void> {
     this._prompt = p;
+    await this.save();
+  }
+
+  public async setFilter(f: number): Promise<void> {
+    if (f < 0 || f > 10) throw new Error("Invalid filter");
+    this._filter = f;
     await this.save();
   }
 }

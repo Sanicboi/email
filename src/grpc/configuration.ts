@@ -5,158 +5,136 @@
  * git: https://github.com/thesayyn/protoc-gen-ts */
 import * as pb_1 from "google-protobuf";
 export class Model extends pb_1.Message {
-  #one_of_decls: number[][] = [];
-  constructor(
-    data?:
-      | any[]
-      | {
-          model?: string;
-        },
-  ) {
-    super();
-    pb_1.Message.initialize(
-      this,
-      Array.isArray(data) ? data : [],
-      0,
-      -1,
-      [],
-      this.#one_of_decls,
-    );
-    if (!Array.isArray(data) && typeof data == "object") {
-      if ("model" in data && data.model != undefined) {
-        this.model = data.model;
-      }
+    #one_of_decls: number[][] = [];
+    constructor(data?: any[] | {
+        model?: string;
+    }) {
+        super();
+        pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+        if (!Array.isArray(data) && typeof data == "object") {
+            if ("model" in data && data.model != undefined) {
+                this.model = data.model;
+            }
+        }
     }
-  }
-  get model() {
-    return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
-  }
-  set model(value: string) {
-    pb_1.Message.setField(this, 1, value);
-  }
-  static fromObject(data: { model?: string }): Model {
-    const message = new Model({});
-    if (data.model != null) {
-      message.model = data.model;
+    get model() {
+        return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
     }
-    return message;
-  }
-  toObject() {
-    const data: {
-      model?: string;
-    } = {};
-    if (this.model != null) {
-      data.model = this.model;
+    set model(value: string) {
+        pb_1.Message.setField(this, 1, value);
     }
-    return data;
-  }
-  serialize(): Uint8Array;
-  serialize(w: pb_1.BinaryWriter): void;
-  serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
-    const writer = w || new pb_1.BinaryWriter();
-    if (this.model.length) writer.writeString(1, this.model);
-    if (!w) return writer.getResultBuffer();
-  }
-  static deserialize(bytes: Uint8Array | pb_1.BinaryReader): Model {
-    const reader =
-        bytes instanceof pb_1.BinaryReader
-          ? bytes
-          : new pb_1.BinaryReader(bytes),
-      message = new Model();
-    while (reader.nextField()) {
-      if (reader.isEndGroup()) break;
-      switch (reader.getFieldNumber()) {
-        case 1:
-          message.model = reader.readString();
-          break;
-        default:
-          reader.skipField();
-      }
+    static fromObject(data: {
+        model?: string;
+    }): Model {
+        const message = new Model({});
+        if (data.model != null) {
+            message.model = data.model;
+        }
+        return message;
     }
-    return message;
-  }
-  serializeBinary(): Uint8Array {
-    return this.serialize();
-  }
-  static deserializeBinary(bytes: Uint8Array): Model {
-    return Model.deserialize(bytes);
-  }
+    toObject() {
+        const data: {
+            model?: string;
+        } = {};
+        if (this.model != null) {
+            data.model = this.model;
+        }
+        return data;
+    }
+    serialize(): Uint8Array;
+    serialize(w: pb_1.BinaryWriter): void;
+    serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+        const writer = w || new pb_1.BinaryWriter();
+        if (this.model.length)
+            writer.writeString(1, this.model);
+        if (!w)
+            return writer.getResultBuffer();
+    }
+    static deserialize(bytes: Uint8Array | pb_1.BinaryReader): Model {
+        const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new Model();
+        while (reader.nextField()) {
+            if (reader.isEndGroup())
+                break;
+            switch (reader.getFieldNumber()) {
+                case 1:
+                    message.model = reader.readString();
+                    break;
+                default: reader.skipField();
+            }
+        }
+        return message;
+    }
+    serializeBinary(): Uint8Array {
+        return this.serialize();
+    }
+    static deserializeBinary(bytes: Uint8Array): Model {
+        return Model.deserialize(bytes);
+    }
 }
 export class Prompt extends pb_1.Message {
-  #one_of_decls: number[][] = [];
-  constructor(
-    data?:
-      | any[]
-      | {
-          prompt?: string;
-        },
-  ) {
-    super();
-    pb_1.Message.initialize(
-      this,
-      Array.isArray(data) ? data : [],
-      0,
-      -1,
-      [],
-      this.#one_of_decls,
-    );
-    if (!Array.isArray(data) && typeof data == "object") {
-      if ("prompt" in data && data.prompt != undefined) {
-        this.prompt = data.prompt;
-      }
+    #one_of_decls: number[][] = [];
+    constructor(data?: any[] | {
+        prompt?: string;
+    }) {
+        super();
+        pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+        if (!Array.isArray(data) && typeof data == "object") {
+            if ("prompt" in data && data.prompt != undefined) {
+                this.prompt = data.prompt;
+            }
+        }
     }
-  }
-  get prompt() {
-    return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
-  }
-  set prompt(value: string) {
-    pb_1.Message.setField(this, 1, value);
-  }
-  static fromObject(data: { prompt?: string }): Prompt {
-    const message = new Prompt({});
-    if (data.prompt != null) {
-      message.prompt = data.prompt;
+    get prompt() {
+        return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
     }
-    return message;
-  }
-  toObject() {
-    const data: {
-      prompt?: string;
-    } = {};
-    if (this.prompt != null) {
-      data.prompt = this.prompt;
+    set prompt(value: string) {
+        pb_1.Message.setField(this, 1, value);
     }
-    return data;
-  }
-  serialize(): Uint8Array;
-  serialize(w: pb_1.BinaryWriter): void;
-  serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
-    const writer = w || new pb_1.BinaryWriter();
-    if (this.prompt.length) writer.writeString(1, this.prompt);
-    if (!w) return writer.getResultBuffer();
-  }
-  static deserialize(bytes: Uint8Array | pb_1.BinaryReader): Prompt {
-    const reader =
-        bytes instanceof pb_1.BinaryReader
-          ? bytes
-          : new pb_1.BinaryReader(bytes),
-      message = new Prompt();
-    while (reader.nextField()) {
-      if (reader.isEndGroup()) break;
-      switch (reader.getFieldNumber()) {
-        case 1:
-          message.prompt = reader.readString();
-          break;
-        default:
-          reader.skipField();
-      }
+    static fromObject(data: {
+        prompt?: string;
+    }): Prompt {
+        const message = new Prompt({});
+        if (data.prompt != null) {
+            message.prompt = data.prompt;
+        }
+        return message;
     }
-    return message;
-  }
-  serializeBinary(): Uint8Array {
-    return this.serialize();
-  }
-  static deserializeBinary(bytes: Uint8Array): Prompt {
-    return Prompt.deserialize(bytes);
-  }
+    toObject() {
+        const data: {
+            prompt?: string;
+        } = {};
+        if (this.prompt != null) {
+            data.prompt = this.prompt;
+        }
+        return data;
+    }
+    serialize(): Uint8Array;
+    serialize(w: pb_1.BinaryWriter): void;
+    serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+        const writer = w || new pb_1.BinaryWriter();
+        if (this.prompt.length)
+            writer.writeString(1, this.prompt);
+        if (!w)
+            return writer.getResultBuffer();
+    }
+    static deserialize(bytes: Uint8Array | pb_1.BinaryReader): Prompt {
+        const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new Prompt();
+        while (reader.nextField()) {
+            if (reader.isEndGroup())
+                break;
+            switch (reader.getFieldNumber()) {
+                case 1:
+                    message.prompt = reader.readString();
+                    break;
+                default: reader.skipField();
+            }
+        }
+        return message;
+    }
+    serializeBinary(): Uint8Array {
+        return this.serialize();
+    }
+    static deserializeBinary(bytes: Uint8Array): Prompt {
+        return Prompt.deserialize(bytes);
+    }
 }
