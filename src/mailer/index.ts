@@ -14,6 +14,7 @@ import { FileName, FileUploadRequest } from "../grpc/files";
 import { v4 } from "uuid";
 import { Model, Prompt } from "../grpc/configuration";
 import fs from 'fs/promises';
+import { authManager } from "./auth";
 
 export const manager = db.manager;
 db.initialize().then(async () => {
@@ -27,7 +28,7 @@ db.initialize().then(async () => {
 
   app.use(express.json());
 
-  app.get("/api/config", (req, res) => {
+  app.get("/api/config", (req, res, next) => authManager.authorize(req, res, next), (req, res) => {
     res.status(200).json(config.asConfig());
   });
 
@@ -38,14 +39,14 @@ db.initialize().then(async () => {
 
   cron.schedule("*/10 * * * *", async () => await poll(onReceive));
 
-  app.get("/api/ai/files", async (req, res) => {
+  app.get("/api/ai/files", (req, res, next) => authManager.authorize(req, res, next), async (req, res) => {
     const files = await client.getFiles(new Empty());
     res.status(200).json({
       files: files.names,
     });
   });
 
-  app.post("/api/ai/files", upload.single("file"), async (req, res) => {
+  app.post("/api/ai/files", (req, res, next) => authManager.authorize(req, res, next), upload.single("file"), async (req, res) => {
     if (!req.file) return res.status(400).end();
     await client.addFile(
       new FileUploadRequest({
@@ -56,7 +57,7 @@ db.initialize().then(async () => {
     res.status(201).end();
   });
 
-  app.delete("/api/ai/files/:name", async (req, res) => {
+  app.delete("/api/ai/files/:name", (req, res, next) => authManager.authorize(req, res, next), async (req, res) => {
     try {
       await client.deleteFile(
         new FileName({
@@ -70,7 +71,7 @@ db.initialize().then(async () => {
     }
   });
 
-  app.get("/api/ai/prompt", async (req, res) => {
+  app.get("/api/ai/prompt", (req, res, next) => authManager.authorize(req, res, next), async (req, res) => {
     const prompt = await client.getPrompt(new Empty());
     res.status(200).json({
       prompt: prompt.prompt,
@@ -79,6 +80,13 @@ db.initialize().then(async () => {
 
   app.put(
     "/api/ai/prompt",
+    (req: express.Request<
+        any,
+        any,
+        {
+          prompt: any;
+        }
+      >, res, next) => authManager.authorize(req, res, next),
     async (
       req: express.Request<
         any,
