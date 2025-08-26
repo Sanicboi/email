@@ -1,5 +1,4 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-import { UserEvent } from "./UserEvent";
 
 export enum UserStatus {
   Error = 0,
@@ -30,6 +29,4 @@ export class User {
   })
   status: UserStatus;
 
-  @OneToMany(() => UserEvent, (event) => event.user)
-  events: UserEvent[];
 }

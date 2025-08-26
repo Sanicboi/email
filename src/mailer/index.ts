@@ -2,7 +2,6 @@ import express from "express";
 import { config, IConfig } from "./config";
 import { db } from "./db";
 import { User } from "../entities/User";
-import { UserEvent } from "../entities/UserEvent";
 import cron from "node-cron";
 import { poll } from "./poll";
 import { onMail, onReceive } from "./handlers";
@@ -41,7 +40,7 @@ db.initialize().then(async () => {
     res.status(200).contentType(".html").send(file).end();
   });
 
-  cron.schedule("* * * * *", async () => await poll(onReceive));
+  cron.schedule("*/3 * * * *", async () => await poll(onReceive));
 
   app.get("/api/ai/files", async (req, res) => {
     const files = await client.getFiles(new Empty());
@@ -182,18 +181,6 @@ db.initialize().then(async () => {
     },
   );
 
-  app.get("/api/users/:id/events", async (req, res) => {
-    const events = await manager
-      .createQueryBuilder(UserEvent, "event")
-      .select()
-      .where("event.userId = :id", {
-        id: req.params.id,
-      })
-      .orderBy("date", "ASC")
-      .getMany();
-    if (events.length === 0) return res.status(404).end();
-    res.status(200).json(events);
-  });
 
   app.post(
     "/api/mail",
