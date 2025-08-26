@@ -1,7 +1,6 @@
 import "reflect-metadata";
 import { DataSource } from "typeorm";
 import { User } from "../entities/User";
-import { UserEvent } from "../entities/UserEvent";
 
 export const db = new DataSource({
   type: "postgres",
@@ -9,7 +8,7 @@ export const db = new DataSource({
   password: process.env.POSTGRES_PASSWORD,
   username: process.env.POSTGRES_USER,
   migrations: [],
-  entities: [User, UserEvent],
+  entities: [User],
   host: "postgres",
   port: 5432,
   logging: false,
