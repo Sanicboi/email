@@ -30,7 +30,7 @@ export const onReceive = async (
   await manager.save(user);
   await smtp.sendMail({
     text: result.response,
-    sender: process.env.YANDEX_USER!,
+    from: process.env.YANDEX_USER!,
     subject: config.topic,
     to: user.email,
   });
@@ -53,7 +53,7 @@ export const onMail = async (amount: number) => {
         text: res.text,
         to: user.email,
         subject: config.topic,
-        sender: process.env.YANDEX_USER!,
+        from: process.env.YANDEX_USER!,
       });
 
       user.status = UserStatus.Sent;
