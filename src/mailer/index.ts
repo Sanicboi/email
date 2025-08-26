@@ -14,9 +14,11 @@ import { FileName, FileUploadRequest } from "../grpc/files";
 import { v4 } from "uuid";
 import { Model, Prompt } from "../grpc/configuration";
 import fs from "fs/promises";
+import { imap } from "./imap";
 
 export const manager = db.manager;
 db.initialize().then(async () => {
+  await imap.connect();
   const upload = multer({
     storage: multer.memoryStorage(),
   });
