@@ -40,7 +40,7 @@ db.initialize().then(async () => {
     res.status(200).contentType(".html").send(file).end();
   });
 
-  cron.schedule("*/3 * * * *", async () => await poll(onReceive));
+  cron.schedule("*/10 * * * *", async () => await poll(onReceive));
 
   app.get("/api/ai/files", async (req, res) => {
     const files = await client.getFiles(new Empty());
