@@ -39,7 +39,10 @@ db.initialize().then(async () => {
     );
     res.status(200).contentType(".html").send(file).end();
   });
-
+  const tasks = cron.getTasks();
+  for (const t of tasks) {
+    await t[1].destroy();
+  }
   cron.schedule("*/10 * * * *", async () => await poll(onReceive));
 
   app.get("/api/ai/files", async (req, res) => {
