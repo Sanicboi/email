@@ -116,6 +116,7 @@ export class AIServiceImpl extends UnimplementedAIService {
       const res = await generateFirstMessage(call.request.data);
       callback(null, new FirstMessage(res));
     } catch (error) {
+      console.error(error);
       callback(new Error("Unknown error"));
     }
   }
