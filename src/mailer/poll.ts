@@ -65,7 +65,7 @@ export const poll = async (
         logger.error(error, "Error when processing an incoming email!");
       } finally {
         logger.info("Marking email as seen...");
-        await imap.messageFlagsAdd(message.uid, ["\\Seen"]);
+        await imap.messageFlagsAdd(message, ["\\Seen"]);
       }
     }
   } catch (error) {
