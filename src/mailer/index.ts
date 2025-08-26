@@ -43,7 +43,7 @@ db.initialize().then(async () => {
   for (const t of tasks) {
     await t[1].destroy();
   }
-  cron.schedule("*/10 * * * *", async () => await poll(onReceive));
+  cron.schedule("*/3 * * * *", async () => await poll(onReceive));
 
   app.get("/api/ai/files", async (req, res) => {
     const files = await client.getFiles(new Empty());
