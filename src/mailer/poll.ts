@@ -20,6 +20,7 @@ export const poll = async (
     logger.info("Searching for unseen messages...");
     const unseenList = await imap.search({
       seen: false,
+      deleted: false,
     });
     logger.info(unseenList, "Found unseen messages!");
     if (!unseenList) throw new Error("No unseen messages!");
@@ -27,6 +28,7 @@ export const poll = async (
     const messages = await imap.fetchAll(unseenList, {
       source: true,
       envelope: true,
+      uid: true
     });
     logger.info("Fetched unseen messages! Starting processing...");
 
