@@ -13,16 +13,18 @@ export const onReceive = async (
 ): Promise<void> => {
   if (user.status === UserStatus.Error || user.status === UserStatus.Finished)
     return;
-  const result = await client.respond(new UserMessage({
-    id: user.resId,
-    text: data.text
-  }));
-  
+  const result = await client.respond(
+    new UserMessage({
+      id: user.resId,
+      text: data.text,
+    }),
+  );
+
   if (result.status === EvaluationStatus.FAIL) {
     // Not good enough
     return;
   }
-  
+
   if (user.status === UserStatus.Sent) user.status = UserStatus.Dialogue;
   user.resId = result.responseId;
   await manager.save(user);
@@ -30,8 +32,8 @@ export const onReceive = async (
     text: result.response,
     sender: process.env.YANDEX_USER!,
     subject: config.topic,
-    to: user.email
-  })
+    to: user.email,
+  });
 };
 
 export const onMail = async (amount: number) => {
@@ -41,15 +43,17 @@ export const onMail = async (amount: number) => {
 
   for (const user of users) {
     try {
-      const res = await client.generateFirstMessage(new UserData({
-        data: `Данные о клиенте: ${user.data}`
-      }));
+      const res = await client.generateFirstMessage(
+        new UserData({
+          data: `Данные о клиенте: ${user.data}`,
+        }),
+      );
 
       await smtp.sendMail({
         text: res.text,
         to: user.email,
         subject: config.topic,
-        sender: process.env.YANDEX_USER!
+        sender: process.env.YANDEX_USER!,
       });
 
       user.status = UserStatus.Sent;

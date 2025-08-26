@@ -18,7 +18,12 @@ class MailerConfiguration implements IConfig {
   public topic: string;
   public attempts: number;
 
-  private _path: string = path.join(process.cwd(), 'data', 'mailer', 'config.json');
+  private _path: string = path.join(
+    process.cwd(),
+    "data",
+    "mailer",
+    "config.json",
+  );
   constructor() {}
 
   public async save(): Promise<void> {

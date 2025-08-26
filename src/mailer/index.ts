@@ -13,7 +13,7 @@ import multer from "multer";
 import { FileName, FileUploadRequest } from "../grpc/files";
 import { v4 } from "uuid";
 import { Model, Prompt } from "../grpc/configuration";
-import fs from 'fs/promises';
+import fs from "fs/promises";
 
 export const manager = db.manager;
 db.initialize().then(async () => {
@@ -31,10 +31,13 @@ db.initialize().then(async () => {
     res.status(200).json(config.asConfig());
   });
 
-  app.get('/', async (req, res) => {
-    const file = await fs.readFile(path.join(process.cwd(), 'dist', 'index.html'), 'utf-8');
-    res.status(200).contentType('.html').send(file).end();
-  })
+  app.get("/", async (req, res) => {
+    const file = await fs.readFile(
+      path.join(process.cwd(), "dist", "index.html"),
+      "utf-8",
+    );
+    res.status(200).contentType(".html").send(file).end();
+  });
 
   cron.schedule("*/10 * * * *", async () => await poll(onReceive));
 
