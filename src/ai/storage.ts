@@ -80,13 +80,14 @@ class Storage {
 
   public async add(file: ICreateStorageFile): Promise<void> {
     if (this._files.has(file.name)) return;
+    
     const res = await openai.files.create({
-      file: new File([file.data], file.name),
+      file: new File([file.data as BlobPart], file.name),
       purpose: "assistants",
     });
     this._files.set(
       file.name,
-      await StorageFile.create(this._dir, res.id, file.name, file.data),
+      await StorageFile.create(this._dir, res.id, file.name, file.data)
     );
   }
 
