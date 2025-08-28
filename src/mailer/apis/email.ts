@@ -40,19 +40,11 @@ class EmailClient {
     await this._imap.connect();
   }
 
-  private async clearJobs(): Promise<void> {
-    const jobs = cron.getTasks();
-    for (const [key, task] of jobs) {
-      await task.destroy();
-    }
-  }
-
   private startPolling(): void {
     cron.schedule(this._cronExpr, async () => await this.poll());
   }
 
   public async init(): Promise<void> {
-    await this.clearJobs();
     await this.connect();
     this.startPolling();
   }

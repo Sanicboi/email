@@ -1,207 +1,36 @@
 import express from "express";
-import { config, IConfig } from "./config";
 import { db } from "./db";
-import { User } from "../entities/User";
+import staticRouter from "./routers/static";
+import authRouter from "./routers/auth";
+import configRouter from "./routers/config";
+import leadsRouter from "./routers/leads";
+import filesRouter from "./routers/files";
+import mailingsRouter from "./routers/mailings";
+import { devAuth, simpleAuth } from "./middleware/auth";
+import { email } from "./apis/email";
+import { mailer } from "./agents/Mailer";
 import cron from "node-cron";
-import { poll } from "./poll";
-import { onMail, onReceive } from "./handlers";
-import path from "path";
-import { client } from "./grpc";
-import { Empty } from "../grpc/shared";
-import multer from "multer";
-import { FileName, FileUploadRequest } from "../grpc/files";
-import { v4 } from "uuid";
-import { Model, Prompt } from "../grpc/configuration";
-import fs from "fs/promises";
-import { imap } from "./imap";
+import { pinoHttp } from "pino-http";
 
 export const manager = db.manager;
 db.initialize().then(async () => {
-  await imap.connect();
-  const upload = multer({
-    storage: multer.memoryStorage(),
-  });
-
   const app = express();
 
-  app.use(express.static(path.join(process.cwd(), "dist")));
+  const logger = pinoHttp();
+
+  app.use(pinoHttp);
 
   app.use(express.json());
+  app.use(staticRouter);
+  app.use("/api", authRouter);
+  app.use("/api/config", devAuth, configRouter);
+  app.use("/api/leads", simpleAuth, leadsRouter);
+  app.use("/api/files", simpleAuth, filesRouter);
+  app.use("/api/mailings", simpleAuth, mailingsRouter);
 
-  app.get("/api/config", (req, res) => {
-    res.status(200).json(config.asConfig());
-  });
-
-  app.get("/", async (req, res) => {
-    const file = await fs.readFile(
-      path.join(process.cwd(), "dist", "index.html"),
-      "utf-8",
-    );
-    res.status(200).contentType(".html").send(file).end();
-  });
-  const tasks = cron.getTasks();
-  for (const t of tasks) {
-    await t[1].destroy();
-  }
-  cron.schedule("* * * * *", async () => await poll(onReceive));
-
-  app.get("/api/ai/files", async (req, res) => {
-    const files = await client.getFiles(new Empty());
-    res.status(200).json({
-      files: files.names,
-    });
-  });
-
-  app.post("/api/ai/files", upload.single("file"), async (req, res) => {
-    if (!req.file) return res.status(400).end();
-    await client.addFile(
-      new FileUploadRequest({
-        content: req.file.buffer,
-        name: `${v4()}${path.extname(req.file.originalname)}`,
-      }),
-    );
-    res.status(201).end();
-  });
-
-  app.delete("/api/ai/files/:name", async (req, res) => {
-    try {
-      await client.deleteFile(
-        new FileName({
-          name: req.params.name,
-        }),
-      );
-      res.status(204).end();
-    } catch (error) {
-      console.error(error);
-      res.status(404).end();
-    }
-  });
-
-  app.get("/api/ai/prompt", async (req, res) => {
-    const prompt = await client.getPrompt(new Empty());
-    res.status(200).json({
-      prompt: prompt.prompt,
-    });
-  });
-
-  app.put(
-    "/api/ai/prompt",
-    async (
-      req: express.Request<
-        any,
-        any,
-        {
-          prompt: any;
-        }
-      >,
-      res,
-    ) => {
-      if (!req.body.prompt || typeof req.body.prompt !== "string")
-        return res.status(400).end();
-      await client.editPrompt(
-        new Prompt({
-          prompt: req.body.prompt,
-        }),
-      );
-      res.status(204).end();
-    },
-  );
-
-  app.get("/api/ai/model", async (req, res) => {
-    const model = await client.getModel(new Empty());
-    res.status(200).json({
-      model: model.model,
-    });
-  });
-
-  app.put(
-    "/api/ai/model",
-    async (
-      req: express.Request<
-        any,
-        any,
-        {
-          model?: string;
-        }
-      >,
-      res,
-    ) => {
-      try {
-        if (!req.body.model || typeof req.body.model !== "string")
-          return res.status(400).end();
-        await client.editModel(
-          new Model({
-            model: req.body.model,
-          }),
-        );
-        res.status(204).end();
-      } catch (error) {
-        console.error(error);
-        res.status(400).end();
-      }
-    },
-  );
-
-  app.put(
-    "/api/config",
-    async (req: express.Request<any, any, Partial<IConfig>>, res) => {
-      if (req.body.attempts) config.attempts = req.body.attempts;
-      if (req.body.responseRating)
-        config.responseRating = req.body.responseRating;
-      if (req.body.sendRating) config.sendRating = req.body.sendRating;
-      if (req.body.specialRating) config.specialRating = req.body.specialRating;
-      if (req.body.topic) config.topic = req.body.topic;
-      if (req.body.waitTime) config.waitTime = req.body.waitTime;
-      await config.save();
-      res.status(204).end();
-    },
-  );
-
-  app.get("/api/users", async (req, res) => {
-    const users = await manager.find(User);
-    res.status(200).json(users);
-  });
-
-  app.post(
-    "/api/users",
-    async (
-      req: express.Request<
-        any,
-        any,
-        {
-          email?: string;
-          data?: string;
-        }
-      >,
-      res,
-    ) => {
-      if (!req.body.email || !req.body.data) return res.status(400).end();
-      const user = new User();
-      user.email = req.body.email;
-      user.data = req.body.data;
-      await manager.save(user);
-      res.status(201).end();
-    },
-  );
-
-  app.post(
-    "/api/mail",
-    async (
-      req: express.Request<
-        any,
-        any,
-        {
-          amount: any;
-        }
-      >,
-      res,
-    ) => {
-      if (!req.body.amount || typeof req.body.amount !== "number")
-        return res.status(400).end();
-      await onMail(req.body.amount);
-      res.status(201).end();
-    },
-  );
+  await email.init();
+  await mailer.init();
+  cron.schedule("7 13 * * *", async () => await mailer.heat());
 
   app.listen(5000);
 });
