@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+
+enum AgentType {
+    Analyzer = 0;
+    Writer = 1;
+    Evaluator = 2;
+}
+
+message Prompt {
+    string prompt = 1;
+    AgentType agent = 2;
+}
+
+message Agent {
+    AgentType agent = 1;
+}

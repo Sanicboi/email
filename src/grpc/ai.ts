@@ -4,92 +4,11 @@
  * source: ai.proto
  * git: https://github.com/thesayyn/protoc-gen-ts */
 import * as dependency_1 from "./shared";
-import * as dependency_2 from "./configuration";
+import * as dependency_2 from "./prompts";
 import * as dependency_3 from "./files";
+import * as dependency_4 from "./model";
 import * as pb_1 from "google-protobuf";
 import * as grpc_1 from "@grpc/grpc-js";
-export enum EvaluationStatus {
-  PASS = 0,
-  FAIL = 1,
-}
-export class FilterValue extends pb_1.Message {
-  #one_of_decls: number[][] = [];
-  constructor(
-    data?:
-      | any[]
-      | {
-          value?: number;
-        },
-  ) {
-    super();
-    pb_1.Message.initialize(
-      this,
-      Array.isArray(data) ? data : [],
-      0,
-      -1,
-      [],
-      this.#one_of_decls,
-    );
-    if (!Array.isArray(data) && typeof data == "object") {
-      if ("value" in data && data.value != undefined) {
-        this.value = data.value;
-      }
-    }
-  }
-  get value() {
-    return pb_1.Message.getFieldWithDefault(this, 1, 0) as number;
-  }
-  set value(value: number) {
-    pb_1.Message.setField(this, 1, value);
-  }
-  static fromObject(data: { value?: number }): FilterValue {
-    const message = new FilterValue({});
-    if (data.value != null) {
-      message.value = data.value;
-    }
-    return message;
-  }
-  toObject() {
-    const data: {
-      value?: number;
-    } = {};
-    if (this.value != null) {
-      data.value = this.value;
-    }
-    return data;
-  }
-  serialize(): Uint8Array;
-  serialize(w: pb_1.BinaryWriter): void;
-  serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
-    const writer = w || new pb_1.BinaryWriter();
-    if (this.value != 0) writer.writeInt32(1, this.value);
-    if (!w) return writer.getResultBuffer();
-  }
-  static deserialize(bytes: Uint8Array | pb_1.BinaryReader): FilterValue {
-    const reader =
-        bytes instanceof pb_1.BinaryReader
-          ? bytes
-          : new pb_1.BinaryReader(bytes),
-      message = new FilterValue();
-    while (reader.nextField()) {
-      if (reader.isEndGroup()) break;
-      switch (reader.getFieldNumber()) {
-        case 1:
-          message.value = reader.readInt32();
-          break;
-        default:
-          reader.skipField();
-      }
-    }
-    return message;
-  }
-  serializeBinary(): Uint8Array {
-    return this.serialize();
-  }
-  static deserializeBinary(bytes: Uint8Array): FilterValue {
-    return FilterValue.deserialize(bytes);
-  }
-}
 export class UserData extends pb_1.Message {
   #one_of_decls: number[][] = [];
   constructor(
@@ -168,14 +87,14 @@ export class UserData extends pb_1.Message {
     return UserData.deserialize(bytes);
   }
 }
-export class FirstMessage extends pb_1.Message {
+export class UserMessage extends pb_1.Message {
   #one_of_decls: number[][] = [];
   constructor(
     data?:
       | any[]
       | {
-          id?: string;
           text?: string;
+          resId?: string;
         },
   ) {
     super();
@@ -188,46 +107,46 @@ export class FirstMessage extends pb_1.Message {
       this.#one_of_decls,
     );
     if (!Array.isArray(data) && typeof data == "object") {
-      if ("id" in data && data.id != undefined) {
-        this.id = data.id;
-      }
       if ("text" in data && data.text != undefined) {
         this.text = data.text;
       }
+      if ("resId" in data && data.resId != undefined) {
+        this.resId = data.resId;
+      }
     }
-  }
-  get id() {
-    return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
-  }
-  set id(value: string) {
-    pb_1.Message.setField(this, 1, value);
   }
   get text() {
-    return pb_1.Message.getFieldWithDefault(this, 2, "") as string;
+    return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
   }
   set text(value: string) {
+    pb_1.Message.setField(this, 1, value);
+  }
+  get resId() {
+    return pb_1.Message.getFieldWithDefault(this, 2, "") as string;
+  }
+  set resId(value: string) {
     pb_1.Message.setField(this, 2, value);
   }
-  static fromObject(data: { id?: string; text?: string }): FirstMessage {
-    const message = new FirstMessage({});
-    if (data.id != null) {
-      message.id = data.id;
-    }
+  static fromObject(data: { text?: string; resId?: string }): UserMessage {
+    const message = new UserMessage({});
     if (data.text != null) {
       message.text = data.text;
+    }
+    if (data.resId != null) {
+      message.resId = data.resId;
     }
     return message;
   }
   toObject() {
     const data: {
-      id?: string;
       text?: string;
+      resId?: string;
     } = {};
-    if (this.id != null) {
-      data.id = this.id;
-    }
     if (this.text != null) {
       data.text = this.text;
+    }
+    if (this.resId != null) {
+      data.resId = this.resId;
     }
     return data;
   }
@@ -235,24 +154,24 @@ export class FirstMessage extends pb_1.Message {
   serialize(w: pb_1.BinaryWriter): void;
   serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
     const writer = w || new pb_1.BinaryWriter();
-    if (this.id.length) writer.writeString(1, this.id);
-    if (this.text.length) writer.writeString(2, this.text);
+    if (this.text.length) writer.writeString(1, this.text);
+    if (this.resId.length) writer.writeString(2, this.resId);
     if (!w) return writer.getResultBuffer();
   }
-  static deserialize(bytes: Uint8Array | pb_1.BinaryReader): FirstMessage {
+  static deserialize(bytes: Uint8Array | pb_1.BinaryReader): UserMessage {
     const reader =
         bytes instanceof pb_1.BinaryReader
           ? bytes
           : new pb_1.BinaryReader(bytes),
-      message = new FirstMessage();
+      message = new UserMessage();
     while (reader.nextField()) {
       if (reader.isEndGroup()) break;
       switch (reader.getFieldNumber()) {
         case 1:
-          message.id = reader.readString();
+          message.text = reader.readString();
           break;
         case 2:
-          message.text = reader.readString();
+          message.resId = reader.readString();
           break;
         default:
           reader.skipField();
@@ -263,11 +182,89 @@ export class FirstMessage extends pb_1.Message {
   serializeBinary(): Uint8Array {
     return this.serialize();
   }
-  static deserializeBinary(bytes: Uint8Array): FirstMessage {
-    return FirstMessage.deserialize(bytes);
+  static deserializeBinary(bytes: Uint8Array): UserMessage {
+    return UserMessage.deserialize(bytes);
   }
 }
-export class UserMessage extends pb_1.Message {
+export class ConversationData extends pb_1.Message {
+  #one_of_decls: number[][] = [];
+  constructor(
+    data?:
+      | any[]
+      | {
+          resId?: string;
+        },
+  ) {
+    super();
+    pb_1.Message.initialize(
+      this,
+      Array.isArray(data) ? data : [],
+      0,
+      -1,
+      [],
+      this.#one_of_decls,
+    );
+    if (!Array.isArray(data) && typeof data == "object") {
+      if ("resId" in data && data.resId != undefined) {
+        this.resId = data.resId;
+      }
+    }
+  }
+  get resId() {
+    return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
+  }
+  set resId(value: string) {
+    pb_1.Message.setField(this, 1, value);
+  }
+  static fromObject(data: { resId?: string }): ConversationData {
+    const message = new ConversationData({});
+    if (data.resId != null) {
+      message.resId = data.resId;
+    }
+    return message;
+  }
+  toObject() {
+    const data: {
+      resId?: string;
+    } = {};
+    if (this.resId != null) {
+      data.resId = this.resId;
+    }
+    return data;
+  }
+  serialize(): Uint8Array;
+  serialize(w: pb_1.BinaryWriter): void;
+  serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+    const writer = w || new pb_1.BinaryWriter();
+    if (this.resId.length) writer.writeString(1, this.resId);
+    if (!w) return writer.getResultBuffer();
+  }
+  static deserialize(bytes: Uint8Array | pb_1.BinaryReader): ConversationData {
+    const reader =
+        bytes instanceof pb_1.BinaryReader
+          ? bytes
+          : new pb_1.BinaryReader(bytes),
+      message = new ConversationData();
+    while (reader.nextField()) {
+      if (reader.isEndGroup()) break;
+      switch (reader.getFieldNumber()) {
+        case 1:
+          message.resId = reader.readString();
+          break;
+        default:
+          reader.skipField();
+      }
+    }
+    return message;
+  }
+  serializeBinary(): Uint8Array {
+    return this.serialize();
+  }
+  static deserializeBinary(bytes: Uint8Array): ConversationData {
+    return ConversationData.deserialize(bytes);
+  }
+}
+export class AIMessage extends pb_1.Message {
   #one_of_decls: number[][] = [];
   constructor(
     data?:
@@ -307,8 +304,8 @@ export class UserMessage extends pb_1.Message {
   set id(value: string) {
     pb_1.Message.setField(this, 2, value);
   }
-  static fromObject(data: { text?: string; id?: string }): UserMessage {
-    const message = new UserMessage({});
+  static fromObject(data: { text?: string; id?: string }): AIMessage {
+    const message = new AIMessage({});
     if (data.text != null) {
       message.text = data.text;
     }
@@ -338,12 +335,12 @@ export class UserMessage extends pb_1.Message {
     if (this.id.length) writer.writeString(2, this.id);
     if (!w) return writer.getResultBuffer();
   }
-  static deserialize(bytes: Uint8Array | pb_1.BinaryReader): UserMessage {
+  static deserialize(bytes: Uint8Array | pb_1.BinaryReader): AIMessage {
     const reader =
         bytes instanceof pb_1.BinaryReader
           ? bytes
           : new pb_1.BinaryReader(bytes),
-      message = new UserMessage();
+      message = new AIMessage();
     while (reader.nextField()) {
       if (reader.isEndGroup()) break;
       switch (reader.getFieldNumber()) {
@@ -362,357 +359,21 @@ export class UserMessage extends pb_1.Message {
   serializeBinary(): Uint8Array {
     return this.serialize();
   }
-  static deserializeBinary(bytes: Uint8Array): UserMessage {
-    return UserMessage.deserialize(bytes);
+  static deserializeBinary(bytes: Uint8Array): AIMessage {
+    return AIMessage.deserialize(bytes);
   }
 }
-export class ResponseData extends pb_1.Message {
-  #one_of_decls: number[][] = [[7], [8], [9], [10]];
-  constructor(
-    data?:
-      | any[]
-      | ({
-          status?: EvaluationStatus;
-          evaluationComment?: string;
-          importance?: number;
-          enthusiasm?: number;
-          delayed?: boolean;
-          delayDate?: string;
-        } & (
-          | {
-              response?: string;
-            }
-          | {
-              responseRating?: number;
-            }
-          | {
-              responseComment?: string;
-            }
-          | {
-              responseId?: string;
-            }
-        )),
-  ) {
-    super();
-    pb_1.Message.initialize(
-      this,
-      Array.isArray(data) ? data : [],
-      0,
-      -1,
-      [],
-      this.#one_of_decls,
-    );
-    if (!Array.isArray(data) && typeof data == "object") {
-      if ("status" in data && data.status != undefined) {
-        this.status = data.status;
-      }
-      if ("evaluationComment" in data && data.evaluationComment != undefined) {
-        this.evaluationComment = data.evaluationComment;
-      }
-      if ("importance" in data && data.importance != undefined) {
-        this.importance = data.importance;
-      }
-      if ("enthusiasm" in data && data.enthusiasm != undefined) {
-        this.enthusiasm = data.enthusiasm;
-      }
-      if ("delayed" in data && data.delayed != undefined) {
-        this.delayed = data.delayed;
-      }
-      if ("delayDate" in data && data.delayDate != undefined) {
-        this.delayDate = data.delayDate;
-      }
-      if ("response" in data && data.response != undefined) {
-        this.response = data.response;
-      }
-      if ("responseRating" in data && data.responseRating != undefined) {
-        this.responseRating = data.responseRating;
-      }
-      if ("responseComment" in data && data.responseComment != undefined) {
-        this.responseComment = data.responseComment;
-      }
-      if ("responseId" in data && data.responseId != undefined) {
-        this.responseId = data.responseId;
-      }
-    }
-  }
-  get status() {
-    return pb_1.Message.getFieldWithDefault(
-      this,
-      1,
-      EvaluationStatus.PASS,
-    ) as EvaluationStatus;
-  }
-  set status(value: EvaluationStatus) {
-    pb_1.Message.setField(this, 1, value);
-  }
-  get evaluationComment() {
-    return pb_1.Message.getFieldWithDefault(this, 2, "") as string;
-  }
-  set evaluationComment(value: string) {
-    pb_1.Message.setField(this, 2, value);
-  }
-  get importance() {
-    return pb_1.Message.getFieldWithDefault(this, 3, 0) as number;
-  }
-  set importance(value: number) {
-    pb_1.Message.setField(this, 3, value);
-  }
-  get enthusiasm() {
-    return pb_1.Message.getFieldWithDefault(this, 4, 0) as number;
-  }
-  set enthusiasm(value: number) {
-    pb_1.Message.setField(this, 4, value);
-  }
-  get delayed() {
-    return pb_1.Message.getFieldWithDefault(this, 5, false) as boolean;
-  }
-  set delayed(value: boolean) {
-    pb_1.Message.setField(this, 5, value);
-  }
-  get delayDate() {
-    return pb_1.Message.getFieldWithDefault(this, 6, "") as string;
-  }
-  set delayDate(value: string) {
-    pb_1.Message.setField(this, 6, value);
-  }
-  get response() {
-    return pb_1.Message.getFieldWithDefault(this, 7, "") as string;
-  }
-  set response(value: string) {
-    pb_1.Message.setOneofField(this, 7, this.#one_of_decls[0], value);
-  }
-  get has_response() {
-    return pb_1.Message.getField(this, 7) != null;
-  }
-  get responseRating() {
-    return pb_1.Message.getFieldWithDefault(this, 8, 0) as number;
-  }
-  set responseRating(value: number) {
-    pb_1.Message.setOneofField(this, 8, this.#one_of_decls[1], value);
-  }
-  get has_responseRating() {
-    return pb_1.Message.getField(this, 8) != null;
-  }
-  get responseComment() {
-    return pb_1.Message.getFieldWithDefault(this, 9, "") as string;
-  }
-  set responseComment(value: string) {
-    pb_1.Message.setOneofField(this, 9, this.#one_of_decls[2], value);
-  }
-  get has_responseComment() {
-    return pb_1.Message.getField(this, 9) != null;
-  }
-  get responseId() {
-    return pb_1.Message.getFieldWithDefault(this, 10, "") as string;
-  }
-  set responseId(value: string) {
-    pb_1.Message.setOneofField(this, 10, this.#one_of_decls[3], value);
-  }
-  get has_responseId() {
-    return pb_1.Message.getField(this, 10) != null;
-  }
-  get _response() {
-    const cases: {
-      [index: number]: "none" | "response";
-    } = {
-      0: "none",
-      7: "response",
-    };
-    return cases[pb_1.Message.computeOneofCase(this, [7])];
-  }
-  get _responseRating() {
-    const cases: {
-      [index: number]: "none" | "responseRating";
-    } = {
-      0: "none",
-      8: "responseRating",
-    };
-    return cases[pb_1.Message.computeOneofCase(this, [8])];
-  }
-  get _responseComment() {
-    const cases: {
-      [index: number]: "none" | "responseComment";
-    } = {
-      0: "none",
-      9: "responseComment",
-    };
-    return cases[pb_1.Message.computeOneofCase(this, [9])];
-  }
-  get _responseId() {
-    const cases: {
-      [index: number]: "none" | "responseId";
-    } = {
-      0: "none",
-      10: "responseId",
-    };
-    return cases[pb_1.Message.computeOneofCase(this, [10])];
-  }
-  static fromObject(data: {
-    status?: EvaluationStatus;
-    evaluationComment?: string;
-    importance?: number;
-    enthusiasm?: number;
-    delayed?: boolean;
-    delayDate?: string;
-    response?: string;
-    responseRating?: number;
-    responseComment?: string;
-    responseId?: string;
-  }): ResponseData {
-    const message = new ResponseData({});
-    if (data.status != null) {
-      message.status = data.status;
-    }
-    if (data.evaluationComment != null) {
-      message.evaluationComment = data.evaluationComment;
-    }
-    if (data.importance != null) {
-      message.importance = data.importance;
-    }
-    if (data.enthusiasm != null) {
-      message.enthusiasm = data.enthusiasm;
-    }
-    if (data.delayed != null) {
-      message.delayed = data.delayed;
-    }
-    if (data.delayDate != null) {
-      message.delayDate = data.delayDate;
-    }
-    if (data.response != null) {
-      message.response = data.response;
-    }
-    if (data.responseRating != null) {
-      message.responseRating = data.responseRating;
-    }
-    if (data.responseComment != null) {
-      message.responseComment = data.responseComment;
-    }
-    if (data.responseId != null) {
-      message.responseId = data.responseId;
-    }
-    return message;
-  }
-  toObject() {
-    const data: {
-      status?: EvaluationStatus;
-      evaluationComment?: string;
-      importance?: number;
-      enthusiasm?: number;
-      delayed?: boolean;
-      delayDate?: string;
-      response?: string;
-      responseRating?: number;
-      responseComment?: string;
-      responseId?: string;
-    } = {};
-    if (this.status != null) {
-      data.status = this.status;
-    }
-    if (this.evaluationComment != null) {
-      data.evaluationComment = this.evaluationComment;
-    }
-    if (this.importance != null) {
-      data.importance = this.importance;
-    }
-    if (this.enthusiasm != null) {
-      data.enthusiasm = this.enthusiasm;
-    }
-    if (this.delayed != null) {
-      data.delayed = this.delayed;
-    }
-    if (this.delayDate != null) {
-      data.delayDate = this.delayDate;
-    }
-    if (this.response != null) {
-      data.response = this.response;
-    }
-    if (this.responseRating != null) {
-      data.responseRating = this.responseRating;
-    }
-    if (this.responseComment != null) {
-      data.responseComment = this.responseComment;
-    }
-    if (this.responseId != null) {
-      data.responseId = this.responseId;
-    }
-    return data;
-  }
-  serialize(): Uint8Array;
-  serialize(w: pb_1.BinaryWriter): void;
-  serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
-    const writer = w || new pb_1.BinaryWriter();
-    if (this.status != EvaluationStatus.PASS) writer.writeEnum(1, this.status);
-    if (this.evaluationComment.length)
-      writer.writeString(2, this.evaluationComment);
-    if (this.importance != 0) writer.writeInt32(3, this.importance);
-    if (this.enthusiasm != 0) writer.writeInt32(4, this.enthusiasm);
-    if (this.delayed != false) writer.writeBool(5, this.delayed);
-    if (this.delayDate.length) writer.writeString(6, this.delayDate);
-    if (this.has_response) writer.writeString(7, this.response);
-    if (this.has_responseRating) writer.writeInt32(8, this.responseRating);
-    if (this.has_responseComment) writer.writeString(9, this.responseComment);
-    if (this.has_responseId) writer.writeString(10, this.responseId);
-    if (!w) return writer.getResultBuffer();
-  }
-  static deserialize(bytes: Uint8Array | pb_1.BinaryReader): ResponseData {
-    const reader =
-        bytes instanceof pb_1.BinaryReader
-          ? bytes
-          : new pb_1.BinaryReader(bytes),
-      message = new ResponseData();
-    while (reader.nextField()) {
-      if (reader.isEndGroup()) break;
-      switch (reader.getFieldNumber()) {
-        case 1:
-          message.status = reader.readEnum();
-          break;
-        case 2:
-          message.evaluationComment = reader.readString();
-          break;
-        case 3:
-          message.importance = reader.readInt32();
-          break;
-        case 4:
-          message.enthusiasm = reader.readInt32();
-          break;
-        case 5:
-          message.delayed = reader.readBool();
-          break;
-        case 6:
-          message.delayDate = reader.readString();
-          break;
-        case 7:
-          message.response = reader.readString();
-          break;
-        case 8:
-          message.responseRating = reader.readInt32();
-          break;
-        case 9:
-          message.responseComment = reader.readString();
-          break;
-        case 10:
-          message.responseId = reader.readString();
-          break;
-        default:
-          reader.skipField();
-      }
-    }
-    return message;
-  }
-  serializeBinary(): Uint8Array {
-    return this.serialize();
-  }
-  static deserializeBinary(bytes: Uint8Array): ResponseData {
-    return ResponseData.deserialize(bytes);
-  }
-}
-export class DialogueData extends pb_1.Message {
+export class ConversationAnalysis extends pb_1.Message {
   #one_of_decls: number[][] = [];
   constructor(
     data?:
       | any[]
       | {
-          id?: string;
+          enthusiasm?: number;
+          rating?: number;
+          comment?: string;
+          isDelayed?: boolean;
+          delayDate?: string;
         },
   ) {
     super();
@@ -725,30 +386,100 @@ export class DialogueData extends pb_1.Message {
       this.#one_of_decls,
     );
     if (!Array.isArray(data) && typeof data == "object") {
-      if ("id" in data && data.id != undefined) {
-        this.id = data.id;
+      if ("enthusiasm" in data && data.enthusiasm != undefined) {
+        this.enthusiasm = data.enthusiasm;
+      }
+      if ("rating" in data && data.rating != undefined) {
+        this.rating = data.rating;
+      }
+      if ("comment" in data && data.comment != undefined) {
+        this.comment = data.comment;
+      }
+      if ("isDelayed" in data && data.isDelayed != undefined) {
+        this.isDelayed = data.isDelayed;
+      }
+      if ("delayDate" in data && data.delayDate != undefined) {
+        this.delayDate = data.delayDate;
       }
     }
   }
-  get id() {
-    return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
+  get enthusiasm() {
+    return pb_1.Message.getFieldWithDefault(this, 1, 0) as number;
   }
-  set id(value: string) {
+  set enthusiasm(value: number) {
     pb_1.Message.setField(this, 1, value);
   }
-  static fromObject(data: { id?: string }): DialogueData {
-    const message = new DialogueData({});
-    if (data.id != null) {
-      message.id = data.id;
+  get rating() {
+    return pb_1.Message.getFieldWithDefault(this, 2, 0) as number;
+  }
+  set rating(value: number) {
+    pb_1.Message.setField(this, 2, value);
+  }
+  get comment() {
+    return pb_1.Message.getFieldWithDefault(this, 3, "") as string;
+  }
+  set comment(value: string) {
+    pb_1.Message.setField(this, 3, value);
+  }
+  get isDelayed() {
+    return pb_1.Message.getFieldWithDefault(this, 4, false) as boolean;
+  }
+  set isDelayed(value: boolean) {
+    pb_1.Message.setField(this, 4, value);
+  }
+  get delayDate() {
+    return pb_1.Message.getFieldWithDefault(this, 5, "") as string;
+  }
+  set delayDate(value: string) {
+    pb_1.Message.setField(this, 5, value);
+  }
+  static fromObject(data: {
+    enthusiasm?: number;
+    rating?: number;
+    comment?: string;
+    isDelayed?: boolean;
+    delayDate?: string;
+  }): ConversationAnalysis {
+    const message = new ConversationAnalysis({});
+    if (data.enthusiasm != null) {
+      message.enthusiasm = data.enthusiasm;
+    }
+    if (data.rating != null) {
+      message.rating = data.rating;
+    }
+    if (data.comment != null) {
+      message.comment = data.comment;
+    }
+    if (data.isDelayed != null) {
+      message.isDelayed = data.isDelayed;
+    }
+    if (data.delayDate != null) {
+      message.delayDate = data.delayDate;
     }
     return message;
   }
   toObject() {
     const data: {
-      id?: string;
+      enthusiasm?: number;
+      rating?: number;
+      comment?: string;
+      isDelayed?: boolean;
+      delayDate?: string;
     } = {};
-    if (this.id != null) {
-      data.id = this.id;
+    if (this.enthusiasm != null) {
+      data.enthusiasm = this.enthusiasm;
+    }
+    if (this.rating != null) {
+      data.rating = this.rating;
+    }
+    if (this.comment != null) {
+      data.comment = this.comment;
+    }
+    if (this.isDelayed != null) {
+      data.isDelayed = this.isDelayed;
+    }
+    if (this.delayDate != null) {
+      data.delayDate = this.delayDate;
     }
     return data;
   }
@@ -756,20 +487,38 @@ export class DialogueData extends pb_1.Message {
   serialize(w: pb_1.BinaryWriter): void;
   serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
     const writer = w || new pb_1.BinaryWriter();
-    if (this.id.length) writer.writeString(1, this.id);
+    if (this.enthusiasm != 0) writer.writeInt32(1, this.enthusiasm);
+    if (this.rating != 0) writer.writeInt32(2, this.rating);
+    if (this.comment.length) writer.writeString(3, this.comment);
+    if (this.isDelayed != false) writer.writeBool(4, this.isDelayed);
+    if (this.delayDate.length) writer.writeString(5, this.delayDate);
     if (!w) return writer.getResultBuffer();
   }
-  static deserialize(bytes: Uint8Array | pb_1.BinaryReader): DialogueData {
+  static deserialize(
+    bytes: Uint8Array | pb_1.BinaryReader,
+  ): ConversationAnalysis {
     const reader =
         bytes instanceof pb_1.BinaryReader
           ? bytes
           : new pb_1.BinaryReader(bytes),
-      message = new DialogueData();
+      message = new ConversationAnalysis();
     while (reader.nextField()) {
       if (reader.isEndGroup()) break;
       switch (reader.getFieldNumber()) {
         case 1:
-          message.id = reader.readString();
+          message.enthusiasm = reader.readInt32();
+          break;
+        case 2:
+          message.rating = reader.readInt32();
+          break;
+        case 3:
+          message.comment = reader.readString();
+          break;
+        case 4:
+          message.isDelayed = reader.readBool();
+          break;
+        case 5:
+          message.delayDate = reader.readString();
           break;
         default:
           reader.skipField();
@@ -780,8 +529,110 @@ export class DialogueData extends pb_1.Message {
   serializeBinary(): Uint8Array {
     return this.serialize();
   }
-  static deserializeBinary(bytes: Uint8Array): DialogueData {
-    return DialogueData.deserialize(bytes);
+  static deserializeBinary(bytes: Uint8Array): ConversationAnalysis {
+    return ConversationAnalysis.deserialize(bytes);
+  }
+}
+export class MessageEvaluation extends pb_1.Message {
+  #one_of_decls: number[][] = [];
+  constructor(
+    data?:
+      | any[]
+      | {
+          rating?: number;
+          comment?: string;
+        },
+  ) {
+    super();
+    pb_1.Message.initialize(
+      this,
+      Array.isArray(data) ? data : [],
+      0,
+      -1,
+      [],
+      this.#one_of_decls,
+    );
+    if (!Array.isArray(data) && typeof data == "object") {
+      if ("rating" in data && data.rating != undefined) {
+        this.rating = data.rating;
+      }
+      if ("comment" in data && data.comment != undefined) {
+        this.comment = data.comment;
+      }
+    }
+  }
+  get rating() {
+    return pb_1.Message.getFieldWithDefault(this, 1, 0) as number;
+  }
+  set rating(value: number) {
+    pb_1.Message.setField(this, 1, value);
+  }
+  get comment() {
+    return pb_1.Message.getFieldWithDefault(this, 2, "") as string;
+  }
+  set comment(value: string) {
+    pb_1.Message.setField(this, 2, value);
+  }
+  static fromObject(data: {
+    rating?: number;
+    comment?: string;
+  }): MessageEvaluation {
+    const message = new MessageEvaluation({});
+    if (data.rating != null) {
+      message.rating = data.rating;
+    }
+    if (data.comment != null) {
+      message.comment = data.comment;
+    }
+    return message;
+  }
+  toObject() {
+    const data: {
+      rating?: number;
+      comment?: string;
+    } = {};
+    if (this.rating != null) {
+      data.rating = this.rating;
+    }
+    if (this.comment != null) {
+      data.comment = this.comment;
+    }
+    return data;
+  }
+  serialize(): Uint8Array;
+  serialize(w: pb_1.BinaryWriter): void;
+  serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+    const writer = w || new pb_1.BinaryWriter();
+    if (this.rating != 0) writer.writeInt32(1, this.rating);
+    if (this.comment.length) writer.writeString(2, this.comment);
+    if (!w) return writer.getResultBuffer();
+  }
+  static deserialize(bytes: Uint8Array | pb_1.BinaryReader): MessageEvaluation {
+    const reader =
+        bytes instanceof pb_1.BinaryReader
+          ? bytes
+          : new pb_1.BinaryReader(bytes),
+      message = new MessageEvaluation();
+    while (reader.nextField()) {
+      if (reader.isEndGroup()) break;
+      switch (reader.getFieldNumber()) {
+        case 1:
+          message.rating = reader.readInt32();
+          break;
+        case 2:
+          message.comment = reader.readString();
+          break;
+        default:
+          reader.skipField();
+      }
+    }
+    return message;
+  }
+  serializeBinary(): Uint8Array {
+    return this.serialize();
+  }
+  static deserializeBinary(bytes: Uint8Array): MessageEvaluation {
+    return MessageEvaluation.deserialize(bytes);
   }
 }
 interface GrpcUnaryServiceInterface<P, R> {
@@ -844,43 +695,31 @@ interface GrpcPromiseServiceInterface<P, R> {
 }
 export abstract class UnimplementedAIService {
   static definition = {
-    generateFirstMessage: {
-      path: "/AI/generateFirstMessage",
+    getPrompt: {
+      path: "/AI/getPrompt",
       requestStream: false,
       responseStream: false,
-      requestSerialize: (message: UserData) => Buffer.from(message.serialize()),
+      requestSerialize: (message: dependency_2.Agent) =>
+        Buffer.from(message.serialize()),
       requestDeserialize: (bytes: Buffer) =>
-        UserData.deserialize(new Uint8Array(bytes)),
-      responseSerialize: (message: FirstMessage) =>
+        dependency_2.Agent.deserialize(new Uint8Array(bytes)),
+      responseSerialize: (message: dependency_2.Prompt) =>
         Buffer.from(message.serialize()),
       responseDeserialize: (bytes: Buffer) =>
-        FirstMessage.deserialize(new Uint8Array(bytes)),
+        dependency_2.Prompt.deserialize(new Uint8Array(bytes)),
     },
-    respond: {
-      path: "/AI/respond",
+    setPrompt: {
+      path: "/AI/setPrompt",
       requestStream: false,
       responseStream: false,
-      requestSerialize: (message: UserMessage) =>
+      requestSerialize: (message: dependency_2.Prompt) =>
         Buffer.from(message.serialize()),
       requestDeserialize: (bytes: Buffer) =>
-        UserMessage.deserialize(new Uint8Array(bytes)),
-      responseSerialize: (message: ResponseData) =>
+        dependency_2.Prompt.deserialize(new Uint8Array(bytes)),
+      responseSerialize: (message: dependency_1.Empty) =>
         Buffer.from(message.serialize()),
       responseDeserialize: (bytes: Buffer) =>
-        ResponseData.deserialize(new Uint8Array(bytes)),
-    },
-    generateHeatMessage: {
-      path: "/AI/generateHeatMessage",
-      requestStream: false,
-      responseStream: false,
-      requestSerialize: (message: DialogueData) =>
-        Buffer.from(message.serialize()),
-      requestDeserialize: (bytes: Buffer) =>
-        DialogueData.deserialize(new Uint8Array(bytes)),
-      responseSerialize: (message: FirstMessage) =>
-        Buffer.from(message.serialize()),
-      responseDeserialize: (bytes: Buffer) =>
-        FirstMessage.deserialize(new Uint8Array(bytes)),
+        dependency_1.Empty.deserialize(new Uint8Array(bytes)),
     },
     getFiles: {
       path: "/AI/getFiles",
@@ -899,14 +738,14 @@ export abstract class UnimplementedAIService {
       path: "/AI/addFile",
       requestStream: false,
       responseStream: false,
-      requestSerialize: (message: dependency_3.FileUploadRequest) =>
+      requestSerialize: (message: dependency_3.FileData) =>
         Buffer.from(message.serialize()),
       requestDeserialize: (bytes: Buffer) =>
-        dependency_3.FileUploadRequest.deserialize(new Uint8Array(bytes)),
-      responseSerialize: (message: dependency_1.Empty) =>
+        dependency_3.FileData.deserialize(new Uint8Array(bytes)),
+      responseSerialize: (message: dependency_3.FileName) =>
         Buffer.from(message.serialize()),
       responseDeserialize: (bytes: Buffer) =>
-        dependency_1.Empty.deserialize(new Uint8Array(bytes)),
+        dependency_3.FileName.deserialize(new Uint8Array(bytes)),
     },
     deleteFile: {
       path: "/AI/deleteFile",
@@ -921,136 +760,145 @@ export abstract class UnimplementedAIService {
       responseDeserialize: (bytes: Buffer) =>
         dependency_1.Empty.deserialize(new Uint8Array(bytes)),
     },
-    getPrompt: {
-      path: "/AI/getPrompt",
-      requestStream: false,
-      responseStream: false,
-      requestSerialize: (message: dependency_1.Empty) =>
-        Buffer.from(message.serialize()),
-      requestDeserialize: (bytes: Buffer) =>
-        dependency_1.Empty.deserialize(new Uint8Array(bytes)),
-      responseSerialize: (message: dependency_2.Prompt) =>
-        Buffer.from(message.serialize()),
-      responseDeserialize: (bytes: Buffer) =>
-        dependency_2.Prompt.deserialize(new Uint8Array(bytes)),
-    },
-    editPrompt: {
-      path: "/AI/editPrompt",
-      requestStream: false,
-      responseStream: false,
-      requestSerialize: (message: dependency_2.Prompt) =>
-        Buffer.from(message.serialize()),
-      requestDeserialize: (bytes: Buffer) =>
-        dependency_2.Prompt.deserialize(new Uint8Array(bytes)),
-      responseSerialize: (message: dependency_1.Empty) =>
-        Buffer.from(message.serialize()),
-      responseDeserialize: (bytes: Buffer) =>
-        dependency_1.Empty.deserialize(new Uint8Array(bytes)),
-    },
     getModel: {
       path: "/AI/getModel",
       requestStream: false,
       responseStream: false,
-      requestSerialize: (message: dependency_1.Empty) =>
+      requestSerialize: (message: dependency_2.Agent) =>
         Buffer.from(message.serialize()),
       requestDeserialize: (bytes: Buffer) =>
-        dependency_1.Empty.deserialize(new Uint8Array(bytes)),
-      responseSerialize: (message: dependency_2.Model) =>
+        dependency_2.Agent.deserialize(new Uint8Array(bytes)),
+      responseSerialize: (message: dependency_4.ModelData) =>
         Buffer.from(message.serialize()),
       responseDeserialize: (bytes: Buffer) =>
-        dependency_2.Model.deserialize(new Uint8Array(bytes)),
+        dependency_4.ModelData.deserialize(new Uint8Array(bytes)),
     },
-    editModel: {
-      path: "/AI/editModel",
+    setModel: {
+      path: "/AI/setModel",
       requestStream: false,
       responseStream: false,
-      requestSerialize: (message: dependency_2.Model) =>
+      requestSerialize: (message: dependency_4.ModelData) =>
         Buffer.from(message.serialize()),
       requestDeserialize: (bytes: Buffer) =>
-        dependency_2.Model.deserialize(new Uint8Array(bytes)),
+        dependency_4.ModelData.deserialize(new Uint8Array(bytes)),
       responseSerialize: (message: dependency_1.Empty) =>
         Buffer.from(message.serialize()),
       responseDeserialize: (bytes: Buffer) =>
         dependency_1.Empty.deserialize(new Uint8Array(bytes)),
     },
-    getFilterValue: {
-      path: "/AI/getFilterValue",
+    write: {
+      path: "/AI/write",
       requestStream: false,
       responseStream: false,
-      requestSerialize: (message: dependency_1.Empty) =>
-        Buffer.from(message.serialize()),
+      requestSerialize: (message: UserData) => Buffer.from(message.serialize()),
       requestDeserialize: (bytes: Buffer) =>
-        dependency_1.Empty.deserialize(new Uint8Array(bytes)),
-      responseSerialize: (message: FilterValue) =>
+        UserData.deserialize(new Uint8Array(bytes)),
+      responseSerialize: (message: AIMessage) =>
         Buffer.from(message.serialize()),
       responseDeserialize: (bytes: Buffer) =>
-        FilterValue.deserialize(new Uint8Array(bytes)),
+        AIMessage.deserialize(new Uint8Array(bytes)),
     },
-    setFilterValue: {
-      path: "/AI/setFilterValue",
+    respond: {
+      path: "/AI/respond",
       requestStream: false,
       responseStream: false,
-      requestSerialize: (message: FilterValue) =>
+      requestSerialize: (message: UserMessage) =>
         Buffer.from(message.serialize()),
       requestDeserialize: (bytes: Buffer) =>
-        FilterValue.deserialize(new Uint8Array(bytes)),
-      responseSerialize: (message: dependency_1.Empty) =>
+        UserMessage.deserialize(new Uint8Array(bytes)),
+      responseSerialize: (message: AIMessage) =>
         Buffer.from(message.serialize()),
       responseDeserialize: (bytes: Buffer) =>
-        dependency_1.Empty.deserialize(new Uint8Array(bytes)),
+        AIMessage.deserialize(new Uint8Array(bytes)),
+    },
+    heat: {
+      path: "/AI/heat",
+      requestStream: false,
+      responseStream: false,
+      requestSerialize: (message: ConversationData) =>
+        Buffer.from(message.serialize()),
+      requestDeserialize: (bytes: Buffer) =>
+        ConversationData.deserialize(new Uint8Array(bytes)),
+      responseSerialize: (message: AIMessage) =>
+        Buffer.from(message.serialize()),
+      responseDeserialize: (bytes: Buffer) =>
+        AIMessage.deserialize(new Uint8Array(bytes)),
+    },
+    analyze: {
+      path: "/AI/analyze",
+      requestStream: false,
+      responseStream: false,
+      requestSerialize: (message: UserMessage) =>
+        Buffer.from(message.serialize()),
+      requestDeserialize: (bytes: Buffer) =>
+        UserMessage.deserialize(new Uint8Array(bytes)),
+      responseSerialize: (message: ConversationAnalysis) =>
+        Buffer.from(message.serialize()),
+      responseDeserialize: (bytes: Buffer) =>
+        ConversationAnalysis.deserialize(new Uint8Array(bytes)),
+    },
+    evaluate: {
+      path: "/AI/evaluate",
+      requestStream: false,
+      responseStream: false,
+      requestSerialize: (message: ConversationData) =>
+        Buffer.from(message.serialize()),
+      requestDeserialize: (bytes: Buffer) =>
+        ConversationData.deserialize(new Uint8Array(bytes)),
+      responseSerialize: (message: MessageEvaluation) =>
+        Buffer.from(message.serialize()),
+      responseDeserialize: (bytes: Buffer) =>
+        MessageEvaluation.deserialize(new Uint8Array(bytes)),
     },
   };
   [method: string]: grpc_1.UntypedHandleCall;
-  abstract generateFirstMessage(
-    call: grpc_1.ServerUnaryCall<UserData, FirstMessage>,
-    callback: grpc_1.sendUnaryData<FirstMessage>,
+  abstract getPrompt(
+    call: grpc_1.ServerUnaryCall<dependency_2.Agent, dependency_2.Prompt>,
+    callback: grpc_1.sendUnaryData<dependency_2.Prompt>,
   ): void;
-  abstract respond(
-    call: grpc_1.ServerUnaryCall<UserMessage, ResponseData>,
-    callback: grpc_1.sendUnaryData<ResponseData>,
-  ): void;
-  abstract generateHeatMessage(
-    call: grpc_1.ServerUnaryCall<DialogueData, FirstMessage>,
-    callback: grpc_1.sendUnaryData<FirstMessage>,
+  abstract setPrompt(
+    call: grpc_1.ServerUnaryCall<dependency_2.Prompt, dependency_1.Empty>,
+    callback: grpc_1.sendUnaryData<dependency_1.Empty>,
   ): void;
   abstract getFiles(
     call: grpc_1.ServerUnaryCall<dependency_1.Empty, dependency_3.FilesList>,
     callback: grpc_1.sendUnaryData<dependency_3.FilesList>,
   ): void;
   abstract addFile(
-    call: grpc_1.ServerUnaryCall<
-      dependency_3.FileUploadRequest,
-      dependency_1.Empty
-    >,
-    callback: grpc_1.sendUnaryData<dependency_1.Empty>,
+    call: grpc_1.ServerUnaryCall<dependency_3.FileData, dependency_3.FileName>,
+    callback: grpc_1.sendUnaryData<dependency_3.FileName>,
   ): void;
   abstract deleteFile(
     call: grpc_1.ServerUnaryCall<dependency_3.FileName, dependency_1.Empty>,
     callback: grpc_1.sendUnaryData<dependency_1.Empty>,
   ): void;
-  abstract getPrompt(
-    call: grpc_1.ServerUnaryCall<dependency_1.Empty, dependency_2.Prompt>,
-    callback: grpc_1.sendUnaryData<dependency_2.Prompt>,
-  ): void;
-  abstract editPrompt(
-    call: grpc_1.ServerUnaryCall<dependency_2.Prompt, dependency_1.Empty>,
-    callback: grpc_1.sendUnaryData<dependency_1.Empty>,
-  ): void;
   abstract getModel(
-    call: grpc_1.ServerUnaryCall<dependency_1.Empty, dependency_2.Model>,
-    callback: grpc_1.sendUnaryData<dependency_2.Model>,
+    call: grpc_1.ServerUnaryCall<dependency_2.Agent, dependency_4.ModelData>,
+    callback: grpc_1.sendUnaryData<dependency_4.ModelData>,
   ): void;
-  abstract editModel(
-    call: grpc_1.ServerUnaryCall<dependency_2.Model, dependency_1.Empty>,
+  abstract setModel(
+    call: grpc_1.ServerUnaryCall<dependency_4.ModelData, dependency_1.Empty>,
     callback: grpc_1.sendUnaryData<dependency_1.Empty>,
   ): void;
-  abstract getFilterValue(
-    call: grpc_1.ServerUnaryCall<dependency_1.Empty, FilterValue>,
-    callback: grpc_1.sendUnaryData<FilterValue>,
+  abstract write(
+    call: grpc_1.ServerUnaryCall<UserData, AIMessage>,
+    callback: grpc_1.sendUnaryData<AIMessage>,
   ): void;
-  abstract setFilterValue(
-    call: grpc_1.ServerUnaryCall<FilterValue, dependency_1.Empty>,
-    callback: grpc_1.sendUnaryData<dependency_1.Empty>,
+  abstract respond(
+    call: grpc_1.ServerUnaryCall<UserMessage, AIMessage>,
+    callback: grpc_1.sendUnaryData<AIMessage>,
+  ): void;
+  abstract heat(
+    call: grpc_1.ServerUnaryCall<ConversationData, AIMessage>,
+    callback: grpc_1.sendUnaryData<AIMessage>,
+  ): void;
+  abstract analyze(
+    call: grpc_1.ServerUnaryCall<UserMessage, ConversationAnalysis>,
+    callback: grpc_1.sendUnaryData<ConversationAnalysis>,
+  ): void;
+  abstract evaluate(
+    call: grpc_1.ServerUnaryCall<ConversationData, MessageEvaluation>,
+    callback: grpc_1.sendUnaryData<MessageEvaluation>,
   ): void;
 }
 export class AIClient extends grpc_1.makeGenericClientConstructor(
@@ -1065,11 +913,14 @@ export class AIClient extends grpc_1.makeGenericClientConstructor(
   ) {
     super(address, credentials, options);
   }
-  generateFirstMessage: GrpcPromiseServiceInterface<UserData, FirstMessage> = (
-    message: UserData,
+  getPrompt: GrpcPromiseServiceInterface<
+    dependency_2.Agent,
+    dependency_2.Prompt
+  > = (
+    message: dependency_2.Agent,
     metadata?: grpc_1.Metadata | grpc_1.CallOptions,
     options?: grpc_1.CallOptions,
-  ): Promise<FirstMessage> => {
+  ): Promise<dependency_2.Prompt> => {
     if (!metadata) {
       metadata = new grpc_1.Metadata();
     }
@@ -1077,11 +928,11 @@ export class AIClient extends grpc_1.makeGenericClientConstructor(
       options = {};
     }
     return new Promise((resolve, reject) =>
-      super.generateFirstMessage(
+      super.getPrompt(
         message,
         metadata,
         options,
-        (error: grpc_1.ServiceError, response: FirstMessage) => {
+        (error: grpc_1.ServiceError, response: dependency_2.Prompt) => {
           if (error) {
             reject(error);
           } else {
@@ -1091,11 +942,14 @@ export class AIClient extends grpc_1.makeGenericClientConstructor(
       ),
     );
   };
-  respond: GrpcPromiseServiceInterface<UserMessage, ResponseData> = (
-    message: UserMessage,
+  setPrompt: GrpcPromiseServiceInterface<
+    dependency_2.Prompt,
+    dependency_1.Empty
+  > = (
+    message: dependency_2.Prompt,
     metadata?: grpc_1.Metadata | grpc_1.CallOptions,
     options?: grpc_1.CallOptions,
-  ): Promise<ResponseData> => {
+  ): Promise<dependency_1.Empty> => {
     if (!metadata) {
       metadata = new grpc_1.Metadata();
     }
@@ -1103,11 +957,11 @@ export class AIClient extends grpc_1.makeGenericClientConstructor(
       options = {};
     }
     return new Promise((resolve, reject) =>
-      super.respond(
+      super.setPrompt(
         message,
         metadata,
         options,
-        (error: grpc_1.ServiceError, response: ResponseData) => {
+        (error: grpc_1.ServiceError, response: dependency_1.Empty) => {
           if (error) {
             reject(error);
           } else {
@@ -1117,33 +971,6 @@ export class AIClient extends grpc_1.makeGenericClientConstructor(
       ),
     );
   };
-  generateHeatMessage: GrpcPromiseServiceInterface<DialogueData, FirstMessage> =
-    (
-      message: DialogueData,
-      metadata?: grpc_1.Metadata | grpc_1.CallOptions,
-      options?: grpc_1.CallOptions,
-    ): Promise<FirstMessage> => {
-      if (!metadata) {
-        metadata = new grpc_1.Metadata();
-      }
-      if (!options) {
-        options = {};
-      }
-      return new Promise((resolve, reject) =>
-        super.generateHeatMessage(
-          message,
-          metadata,
-          options,
-          (error: grpc_1.ServiceError, response: FirstMessage) => {
-            if (error) {
-              reject(error);
-            } else {
-              resolve(response);
-            }
-          },
-        ),
-      );
-    };
   getFiles: GrpcPromiseServiceInterface<
     dependency_1.Empty,
     dependency_3.FilesList
@@ -1174,13 +1001,13 @@ export class AIClient extends grpc_1.makeGenericClientConstructor(
     );
   };
   addFile: GrpcPromiseServiceInterface<
-    dependency_3.FileUploadRequest,
-    dependency_1.Empty
+    dependency_3.FileData,
+    dependency_3.FileName
   > = (
-    message: dependency_3.FileUploadRequest,
+    message: dependency_3.FileData,
     metadata?: grpc_1.Metadata | grpc_1.CallOptions,
     options?: grpc_1.CallOptions,
-  ): Promise<dependency_1.Empty> => {
+  ): Promise<dependency_3.FileName> => {
     if (!metadata) {
       metadata = new grpc_1.Metadata();
     }
@@ -1192,7 +1019,7 @@ export class AIClient extends grpc_1.makeGenericClientConstructor(
         message,
         metadata,
         options,
-        (error: grpc_1.ServiceError, response: dependency_1.Empty) => {
+        (error: grpc_1.ServiceError, response: dependency_3.FileName) => {
           if (error) {
             reject(error);
           } else {
@@ -1231,72 +1058,14 @@ export class AIClient extends grpc_1.makeGenericClientConstructor(
       ),
     );
   };
-  getPrompt: GrpcPromiseServiceInterface<
-    dependency_1.Empty,
-    dependency_2.Prompt
-  > = (
-    message: dependency_1.Empty,
-    metadata?: grpc_1.Metadata | grpc_1.CallOptions,
-    options?: grpc_1.CallOptions,
-  ): Promise<dependency_2.Prompt> => {
-    if (!metadata) {
-      metadata = new grpc_1.Metadata();
-    }
-    if (!options) {
-      options = {};
-    }
-    return new Promise((resolve, reject) =>
-      super.getPrompt(
-        message,
-        metadata,
-        options,
-        (error: grpc_1.ServiceError, response: dependency_2.Prompt) => {
-          if (error) {
-            reject(error);
-          } else {
-            resolve(response);
-          }
-        },
-      ),
-    );
-  };
-  editPrompt: GrpcPromiseServiceInterface<
-    dependency_2.Prompt,
-    dependency_1.Empty
-  > = (
-    message: dependency_2.Prompt,
-    metadata?: grpc_1.Metadata | grpc_1.CallOptions,
-    options?: grpc_1.CallOptions,
-  ): Promise<dependency_1.Empty> => {
-    if (!metadata) {
-      metadata = new grpc_1.Metadata();
-    }
-    if (!options) {
-      options = {};
-    }
-    return new Promise((resolve, reject) =>
-      super.editPrompt(
-        message,
-        metadata,
-        options,
-        (error: grpc_1.ServiceError, response: dependency_1.Empty) => {
-          if (error) {
-            reject(error);
-          } else {
-            resolve(response);
-          }
-        },
-      ),
-    );
-  };
   getModel: GrpcPromiseServiceInterface<
-    dependency_1.Empty,
-    dependency_2.Model
+    dependency_2.Agent,
+    dependency_4.ModelData
   > = (
-    message: dependency_1.Empty,
+    message: dependency_2.Agent,
     metadata?: grpc_1.Metadata | grpc_1.CallOptions,
     options?: grpc_1.CallOptions,
-  ): Promise<dependency_2.Model> => {
+  ): Promise<dependency_4.ModelData> => {
     if (!metadata) {
       metadata = new grpc_1.Metadata();
     }
@@ -1308,7 +1077,7 @@ export class AIClient extends grpc_1.makeGenericClientConstructor(
         message,
         metadata,
         options,
-        (error: grpc_1.ServiceError, response: dependency_2.Model) => {
+        (error: grpc_1.ServiceError, response: dependency_4.ModelData) => {
           if (error) {
             reject(error);
           } else {
@@ -1318,11 +1087,11 @@ export class AIClient extends grpc_1.makeGenericClientConstructor(
       ),
     );
   };
-  editModel: GrpcPromiseServiceInterface<
-    dependency_2.Model,
+  setModel: GrpcPromiseServiceInterface<
+    dependency_4.ModelData,
     dependency_1.Empty
   > = (
-    message: dependency_2.Model,
+    message: dependency_4.ModelData,
     metadata?: grpc_1.Metadata | grpc_1.CallOptions,
     options?: grpc_1.CallOptions,
   ): Promise<dependency_1.Empty> => {
@@ -1333,7 +1102,7 @@ export class AIClient extends grpc_1.makeGenericClientConstructor(
       options = {};
     }
     return new Promise((resolve, reject) =>
-      super.editModel(
+      super.setModel(
         message,
         metadata,
         options,
@@ -1347,58 +1116,134 @@ export class AIClient extends grpc_1.makeGenericClientConstructor(
       ),
     );
   };
-  getFilterValue: GrpcPromiseServiceInterface<dependency_1.Empty, FilterValue> =
-    (
-      message: dependency_1.Empty,
-      metadata?: grpc_1.Metadata | grpc_1.CallOptions,
-      options?: grpc_1.CallOptions,
-    ): Promise<FilterValue> => {
-      if (!metadata) {
-        metadata = new grpc_1.Metadata();
-      }
-      if (!options) {
-        options = {};
-      }
-      return new Promise((resolve, reject) =>
-        super.getFilterValue(
-          message,
-          metadata,
-          options,
-          (error: grpc_1.ServiceError, response: FilterValue) => {
-            if (error) {
-              reject(error);
-            } else {
-              resolve(response);
-            }
-          },
-        ),
-      );
-    };
-  setFilterValue: GrpcPromiseServiceInterface<FilterValue, dependency_1.Empty> =
-    (
-      message: FilterValue,
-      metadata?: grpc_1.Metadata | grpc_1.CallOptions,
-      options?: grpc_1.CallOptions,
-    ): Promise<dependency_1.Empty> => {
-      if (!metadata) {
-        metadata = new grpc_1.Metadata();
-      }
-      if (!options) {
-        options = {};
-      }
-      return new Promise((resolve, reject) =>
-        super.setFilterValue(
-          message,
-          metadata,
-          options,
-          (error: grpc_1.ServiceError, response: dependency_1.Empty) => {
-            if (error) {
-              reject(error);
-            } else {
-              resolve(response);
-            }
-          },
-        ),
-      );
-    };
+  write: GrpcPromiseServiceInterface<UserData, AIMessage> = (
+    message: UserData,
+    metadata?: grpc_1.Metadata | grpc_1.CallOptions,
+    options?: grpc_1.CallOptions,
+  ): Promise<AIMessage> => {
+    if (!metadata) {
+      metadata = new grpc_1.Metadata();
+    }
+    if (!options) {
+      options = {};
+    }
+    return new Promise((resolve, reject) =>
+      super.write(
+        message,
+        metadata,
+        options,
+        (error: grpc_1.ServiceError, response: AIMessage) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve(response);
+          }
+        },
+      ),
+    );
+  };
+  respond: GrpcPromiseServiceInterface<UserMessage, AIMessage> = (
+    message: UserMessage,
+    metadata?: grpc_1.Metadata | grpc_1.CallOptions,
+    options?: grpc_1.CallOptions,
+  ): Promise<AIMessage> => {
+    if (!metadata) {
+      metadata = new grpc_1.Metadata();
+    }
+    if (!options) {
+      options = {};
+    }
+    return new Promise((resolve, reject) =>
+      super.respond(
+        message,
+        metadata,
+        options,
+        (error: grpc_1.ServiceError, response: AIMessage) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve(response);
+          }
+        },
+      ),
+    );
+  };
+  heat: GrpcPromiseServiceInterface<ConversationData, AIMessage> = (
+    message: ConversationData,
+    metadata?: grpc_1.Metadata | grpc_1.CallOptions,
+    options?: grpc_1.CallOptions,
+  ): Promise<AIMessage> => {
+    if (!metadata) {
+      metadata = new grpc_1.Metadata();
+    }
+    if (!options) {
+      options = {};
+    }
+    return new Promise((resolve, reject) =>
+      super.heat(
+        message,
+        metadata,
+        options,
+        (error: grpc_1.ServiceError, response: AIMessage) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve(response);
+          }
+        },
+      ),
+    );
+  };
+  analyze: GrpcPromiseServiceInterface<UserMessage, ConversationAnalysis> = (
+    message: UserMessage,
+    metadata?: grpc_1.Metadata | grpc_1.CallOptions,
+    options?: grpc_1.CallOptions,
+  ): Promise<ConversationAnalysis> => {
+    if (!metadata) {
+      metadata = new grpc_1.Metadata();
+    }
+    if (!options) {
+      options = {};
+    }
+    return new Promise((resolve, reject) =>
+      super.analyze(
+        message,
+        metadata,
+        options,
+        (error: grpc_1.ServiceError, response: ConversationAnalysis) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve(response);
+          }
+        },
+      ),
+    );
+  };
+  evaluate: GrpcPromiseServiceInterface<ConversationData, MessageEvaluation> = (
+    message: ConversationData,
+    metadata?: grpc_1.Metadata | grpc_1.CallOptions,
+    options?: grpc_1.CallOptions,
+  ): Promise<MessageEvaluation> => {
+    if (!metadata) {
+      metadata = new grpc_1.Metadata();
+    }
+    if (!options) {
+      options = {};
+    }
+    return new Promise((resolve, reject) =>
+      super.evaluate(
+        message,
+        metadata,
+        options,
+        (error: grpc_1.ServiceError, response: MessageEvaluation) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve(response);
+          }
+        },
+      ),
+    );
+  };
 }

@@ -1,66 +1,57 @@
 syntax = "proto3";
 
 import "shared.proto";
-import "configuration.proto";
+import "prompts.proto";
 import "files.proto";
+import "model.proto";
 
 service AI {
-
-    rpc generateFirstMessage(UserData) returns (FirstMessage);
-    rpc respond(UserMessage) returns (ResponseData);
-    rpc generateHeatMessage(DialogueData) returns (FirstMessage);
-
+    rpc getPrompt(Agent) returns (Prompt);
+    rpc setPrompt(Prompt) returns (Empty);
 
     rpc getFiles(Empty) returns (FilesList);
-    rpc addFile(FileUploadRequest) returns (Empty);
+    rpc addFile(FileData) returns (FileName);
     rpc deleteFile(FileName) returns (Empty);
 
-    rpc getPrompt(Empty) returns (Prompt);
-    rpc editPrompt(Prompt) returns (Empty);
-    rpc getModel(Empty) returns (Model);
-    rpc editModel(Model) returns (Empty);
+    rpc getModel(Agent) returns (ModelData);
+    rpc setModel(ModelData) returns (Empty);
 
-    rpc getFilterValue(Empty) returns (FilterValue);
-    rpc setFilterValue(FilterValue) returns (Empty);
-}
+    rpc write(UserData) returns (AIMessage);
+    rpc respond(UserMessage) returns (AIMessage);
+    rpc heat(ConversationData) returns (AIMessage);
 
-
-enum EvaluationStatus {
-    PASS = 0;
-    FAIL = 1;
-}
-
-message FilterValue {
-    int32 value = 1;
+    rpc analyze(UserMessage) returns (ConversationAnalysis);
+    rpc evaluate(ConversationData) returns (MessageEvaluation);
 }
 
 message UserData {
     string data = 1;
 }
 
-message FirstMessage {
-    string id = 1;
-    string text = 2;
+message UserMessage {
+    string text = 1;
+    string resId = 2;
 }
 
-message UserMessage {
+
+message ConversationData {
+    string resId = 1;
+}
+
+message AIMessage {
     string text = 1;
     string id = 2;
 }
 
-message ResponseData {
-    EvaluationStatus status = 1;
-    string evaluationComment = 2;
-    int32 importance = 3;
-    int32 enthusiasm = 4;
-    bool delayed = 5;
-    string delayDate = 6;
-    optional string response = 7;
-    optional int32 responseRating = 8;
-    optional string responseComment = 9;
-    optional string responseId = 10;
+message ConversationAnalysis {
+    int32 enthusiasm = 1;
+    int32 rating = 2;
+    string comment = 3;
+    bool isDelayed = 4;
+    string delayDate = 5;
 }
 
-message DialogueData {
-    string id = 1;
+message MessageEvaluation {
+    int32 rating = 1;
+    string comment = 2;
 }

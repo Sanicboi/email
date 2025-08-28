@@ -1,32 +1,18 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
-export enum UserStatus {
-  Error = 0,
-  NotSent = 1,
-  Sent = 2,
-  Dialogue = 3,
-  Finished = 4,
-}
-
 @Entity()
 export class User {
-  @PrimaryGeneratedColumn("uuid")
+  @PrimaryGeneratedColumn()
   id: string;
 
   @Column()
-  email: string;
+  name: string;
 
   @Column()
-  data: string;
+  password: string;
 
   @Column({
-    nullable: true,
+    default: false,
   })
-  resId: string;
-
-  @Column("int", {
-    default: UserStatus.NotSent,
-  })
-  status: UserStatus;
-
+  isDev: boolean;
 }

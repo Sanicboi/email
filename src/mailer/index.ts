@@ -184,7 +184,6 @@ db.initialize().then(async () => {
     },
   );
 
-
   app.post(
     "/api/mail",
     async (

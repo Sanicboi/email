@@ -176,13 +176,12 @@ export class FilesList extends pb_1.Message {
     return FilesList.deserialize(bytes);
   }
 }
-export class FileUploadRequest extends pb_1.Message {
+export class FileData extends pb_1.Message {
   #one_of_decls: number[][] = [];
   constructor(
     data?:
       | any[]
       | {
-          name?: string;
           content?: Uint8Array;
         },
   ) {
@@ -196,38 +195,23 @@ export class FileUploadRequest extends pb_1.Message {
       this.#one_of_decls,
     );
     if (!Array.isArray(data) && typeof data == "object") {
-      if ("name" in data && data.name != undefined) {
-        this.name = data.name;
-      }
       if ("content" in data && data.content != undefined) {
         this.content = data.content;
       }
     }
   }
-  get name() {
-    return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
-  }
-  set name(value: string) {
-    pb_1.Message.setField(this, 1, value);
-  }
   get content() {
     return pb_1.Message.getFieldWithDefault(
       this,
-      2,
+      1,
       new Uint8Array(0),
     ) as Uint8Array;
   }
   set content(value: Uint8Array) {
-    pb_1.Message.setField(this, 2, value);
+    pb_1.Message.setField(this, 1, value);
   }
-  static fromObject(data: {
-    name?: string;
-    content?: Uint8Array;
-  }): FileUploadRequest {
-    const message = new FileUploadRequest({});
-    if (data.name != null) {
-      message.name = data.name;
-    }
+  static fromObject(data: { content?: Uint8Array }): FileData {
+    const message = new FileData({});
     if (data.content != null) {
       message.content = data.content;
     }
@@ -235,12 +219,8 @@ export class FileUploadRequest extends pb_1.Message {
   }
   toObject() {
     const data: {
-      name?: string;
       content?: Uint8Array;
     } = {};
-    if (this.name != null) {
-      data.name = this.name;
-    }
     if (this.content != null) {
       data.content = this.content;
     }
@@ -250,23 +230,19 @@ export class FileUploadRequest extends pb_1.Message {
   serialize(w: pb_1.BinaryWriter): void;
   serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
     const writer = w || new pb_1.BinaryWriter();
-    if (this.name.length) writer.writeString(1, this.name);
-    if (this.content.length) writer.writeBytes(2, this.content);
+    if (this.content.length) writer.writeBytes(1, this.content);
     if (!w) return writer.getResultBuffer();
   }
-  static deserialize(bytes: Uint8Array | pb_1.BinaryReader): FileUploadRequest {
+  static deserialize(bytes: Uint8Array | pb_1.BinaryReader): FileData {
     const reader =
         bytes instanceof pb_1.BinaryReader
           ? bytes
           : new pb_1.BinaryReader(bytes),
-      message = new FileUploadRequest();
+      message = new FileData();
     while (reader.nextField()) {
       if (reader.isEndGroup()) break;
       switch (reader.getFieldNumber()) {
         case 1:
-          message.name = reader.readString();
-          break;
-        case 2:
           message.content = reader.readBytes();
           break;
         default:
@@ -278,7 +254,7 @@ export class FileUploadRequest extends pb_1.Message {
   serializeBinary(): Uint8Array {
     return this.serialize();
   }
-  static deserializeBinary(bytes: Uint8Array): FileUploadRequest {
-    return FileUploadRequest.deserialize(bytes);
+  static deserializeBinary(bytes: Uint8Array): FileData {
+    return FileData.deserialize(bytes);
   }
 }

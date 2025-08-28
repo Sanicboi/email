@@ -31,6 +31,7 @@
     "@grpc/proto-loader": "^0.7.15",
     "@types/node-telegram-bot-api": "^0.64.9",
     "bcrypt": "^6.0.0",
+    "dayjs": "^1.11.15",
     "dotenv": "^17.2.0",
     "express": "^5.1.0",
     "google-protobuf": "^3.21.4",
