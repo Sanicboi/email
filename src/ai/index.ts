@@ -1,14 +1,15 @@
 import "dotenv/config";
 import * as grpc from "@grpc/grpc-js";
 import { AIServiceImpl } from "./impl";
-import { config } from "./config";
-import { storage } from "./storage";
+import { analyzer } from "./agents/Analyzer";
+import { evaluator } from "./agents/Evaluator";
+import { writer } from "./agents/Writer";
 
 const server = new grpc.Server();
 server.addService(AIServiceImpl.definition, new AIServiceImpl());
-config
-  .init()
-  .then(() => storage.init())
+analyzer.init()
+  .then(() => evaluator.init())
+  .then(() => writer.init())
   .then(() => {
     server.bindAsync(
       "0.0.0.0:8080",

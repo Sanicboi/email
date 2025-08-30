@@ -4,6 +4,7 @@ import { client } from "../apis/grpc";
 import { Empty } from "../../grpc/shared";
 import { logger } from "../../logger";
 import { FileData, FileName } from "../../grpc/files";
+import path from "path";
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -26,6 +27,7 @@ router.post("/", upload.single("file"), async (req, res) => {
     const name = await client.addFile(
       new FileData({
         content: req.file?.buffer,
+        extension: path.extname(req.file?.originalname!),
       }),
     );
     res.status(201).json({

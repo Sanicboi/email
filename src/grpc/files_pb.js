@@ -392,6 +392,7 @@ if (jspb.Message.GENERATE_TO_OBJECT) {
     var f,
       obj = {
         content: msg.getContent_asB64(),
+        extension: jspb.Message.getFieldWithDefault(msg, 2, ""),
       };
 
     if (includeInstance) {
@@ -430,6 +431,10 @@ proto.FileData.deserializeBinaryFromReader = function (msg, reader) {
         var value = /** @type {!Uint8Array} */ (reader.readBytes());
         msg.setContent(value);
         break;
+      case 2:
+        var value = /** @type {string} */ (reader.readString());
+        msg.setExtension$(value);
+        break;
       default:
         reader.skipField();
         break;
@@ -460,6 +465,10 @@ proto.FileData.serializeBinaryToWriter = function (message, writer) {
   f = message.getContent_asU8();
   if (f.length > 0) {
     writer.writeBytes(1, f);
+  }
+  f = message.getExtension$();
+  if (f.length > 0) {
+    writer.writeString(2, f);
   }
 };
 
@@ -499,6 +508,22 @@ proto.FileData.prototype.getContent_asU8 = function () {
  */
 proto.FileData.prototype.setContent = function (value) {
   return jspb.Message.setProto3BytesField(this, 1, value);
+};
+
+/**
+ * optional string extension = 2;
+ * @return {string}
+ */
+proto.FileData.prototype.getExtension$ = function () {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
+};
+
+/**
+ * @param {string} value
+ * @return {!proto.FileData} returns this
+ */
+proto.FileData.prototype.setExtension$ = function (value) {
+  return jspb.Message.setProto3StringField(this, 2, value);
 };
 
 goog.object.extend(exports, proto);

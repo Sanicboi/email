@@ -12,4 +12,5 @@ message FilesList {
 
 message FileData {
     bytes content = 1;
+    string extension = 2;
 }

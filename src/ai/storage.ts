@@ -1,151 +1,121 @@
 import fs from "fs/promises";
 import path from "path";
 import { openai } from "./openai";
+import { v4 } from "uuid";
 
-export interface IStorageFile {
+interface IStorageFile {
   id: string;
   name: string;
 }
 
-export interface ICreateStorageFile {
-  name: string;
-  data: Buffer;
+interface IStorageConfig {
+  id: string;
+  files: IStorageFile[];
 }
 
-export class StorageFile implements IStorageFile {
+class StorageConfig implements IStorageConfig {
   constructor(
-    private _dir: string,
-    public id: string,
-    public name: string,
+    public id: string = "",
+    public files: IStorageFile[] = [],
   ) {}
-
-  public static async create(
-    _dir: string,
-    id: string,
-    name: string,
-    data: Buffer,
-  ): Promise<StorageFile> {
-    await fs.writeFile(path.join(_dir, name), data);
-    return new StorageFile(_dir, id, name);
-  }
-
-  public async getData(): Promise<Buffer> {
-    return await fs.readFile(path.join(this._dir, this.name));
-  }
-
-  public async destroy(): Promise<void> {
-    await fs.rm(path.join(this._dir, this.name));
-  }
 }
 
-class Storage {
-  private _dir = path.join(process.cwd(), "data", "ai", "storage");
-  private _confPath = path.join(process.cwd(), "data", "ai", "storage.json");
-  private _files: Map<string, StorageFile> = new Map();
-  private _vectorStoreId: string = "";
-
-  public constructor() {}
+export class FileStorage {
+  private _dir: string = path.join(process.cwd(), "data", "ai", "storage");
+  private _configPath: string = path.join(
+    process.cwd(),
+    "data",
+    "ai",
+    "storage.json",
+  );
+  private config: StorageConfig;
+  constructor() {}
 
   public async init(): Promise<void> {
-    const config: {
-      files: IStorageFile[];
-      vectorStoreId: string;
-    } = JSON.parse(await fs.readFile(this._confPath, "utf-8"));
-
-    // check that the vector store exists
+    // check config
     try {
-      const vectorStoreData = await openai.vectorStores.retrieve(
-        config.vectorStoreId,
+      const confData: IStorageConfig = JSON.parse(
+        await fs.readFile(this._configPath, "utf-8"),
       );
+      this.config = new StorageConfig(confData.id, confData.files);
     } catch (error) {
-      config.vectorStoreId = (
+      this.config = new StorageConfig();
+      await this.saveConfig();
+    }
+
+    // check vector store id
+    try {
+      if (!this.config.id) throw new Error("No vector store id");
+      const vsData = await openai.vectorStores.retrieve(this.config.id);
+    } catch (error) {
+      this.config.id = (
         await openai.vectorStores.create({
           file_ids: [],
         })
       ).id;
+      await this.saveConfig();
     }
-    this._vectorStoreId = config.vectorStoreId;
 
-    // check that all the files exist in openai
-    for (const file of config.files) {
+    const idsSet: Set<string> = new Set();
+
+    for (const file of this.config.files) {
       try {
-        const fromApi = await openai.files.retrieve(file.id);
-        if (!fromApi) continue;
-        this._files.set(
-          file.name,
-          new StorageFile(this._dir, file.id, file.name),
-        );
+        await openai.files.retrieve(file.id);
+        await this.loadFile(file.name);
+        idsSet.add(file.id);
       } catch (error) {
-        try {
-          await this.add({
-            data: await fs.readFile(path.join(this._dir, file.name)),
-            name: file.name,
-          });
-        } catch (error) {
-          console.error(`Error fallback adding file: ${error}`);
-        }
+        continue;
       }
     }
 
-    // check that all files are in the vector store
-    const storeFiles = await openai.vectorStores.files.list(
-      this._vectorStoreId,
-    );
-    for (const [name, file] of this._files) {
-      if (!storeFiles.data.find((el) => el.id === file.id)) {
-        await openai.vectorStores.files.create(this._vectorStoreId, {
-          file_id: file.id,
-        });
-      }
-    }
-
-    await this.save();
+    this.config.files = this.config.files.filter((el) => idsSet.has(el.id));
   }
 
-  private async save(): Promise<void> {
-    await fs.writeFile(
-      this._confPath,
-      JSON.stringify({
-        files: Array.from(this._files.values()),
-        vectoreStoreId: this._vectorStoreId,
-      }),
-    );
+  private async saveConfig(): Promise<void> {
+    await fs.writeFile(this._configPath, JSON.stringify(this.config), "utf-8");
   }
 
-  public getOne(name: string): StorageFile | undefined {
-    return this._files.get(name);
+  private async loadFile(name: string): Promise<Buffer> {
+    const buf = await fs.readFile(path.join(this._dir, name));
+    return buf;
   }
 
-  public getAll(): StorageFile[] {
-    return Array.from(this._files.values());
-  }
+  public async addFile(buffer: Buffer, extension: string): Promise<string> {
+    const name = `${v4()}${extension}`;
+    await fs.writeFile(path.join(this._dir, name), buffer);
 
-  public async add(file: ICreateStorageFile): Promise<void> {
-    if (this._files.has(file.name)) return;
-
-    const res = await openai.files.create({
-      file: new File([file.data as BlobPart], file.name),
+    const r = await openai.files.create({
+      file: new File([buffer as BlobPart], name),
       purpose: "assistants",
     });
-    await openai.vectorStores.files.create(this._vectorStoreId, {
-      file_id: res.id,
+
+    await openai.vectorStores.files.create(this.config.id, {
+      file_id: r.id,
     });
-    this._files.set(
-      file.name,
-      await StorageFile.create(this._dir, res.id, file.name, file.data),
-    );
+
+    this.config.files.push({
+      id: r.id,
+      name,
+    });
+
+    await this.saveConfig();
+    return name;
+  }
+
+  public getFiles(): string[] {
+    return this.config.files.map((el) => el.name);
   }
 
   public async deleteFile(name: string): Promise<void> {
-    const file = this._files.get(name);
-    if (!file) return;
-    await file.destroy();
-    await openai.files.delete(file.id);
+    const f = this.config.files.find((el) => el.name === name);
+    if (!f) throw new Error("Not found");
+    this.config.files = this.config.files.filter((el) => el.name !== name);
+    await this.saveConfig();
+    await openai.files.delete(f.id);
+    await fs.rm(path.join(this._dir, f.name));
   }
 
-  public get storeId(): string {
-    return this._vectorStoreId;
+  public get id(): string {
+    return this.config.id;
   }
 }
-
-export const storage = new Storage();

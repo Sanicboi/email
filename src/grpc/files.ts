@@ -183,6 +183,7 @@ export class FileData extends pb_1.Message {
       | any[]
       | {
           content?: Uint8Array;
+          extension?: string;
         },
   ) {
     super();
@@ -198,6 +199,9 @@ export class FileData extends pb_1.Message {
       if ("content" in data && data.content != undefined) {
         this.content = data.content;
       }
+      if ("extension" in data && data.extension != undefined) {
+        this.extension = data.extension;
+      }
     }
   }
   get content() {
@@ -210,19 +214,35 @@ export class FileData extends pb_1.Message {
   set content(value: Uint8Array) {
     pb_1.Message.setField(this, 1, value);
   }
-  static fromObject(data: { content?: Uint8Array }): FileData {
+  get extension() {
+    return pb_1.Message.getFieldWithDefault(this, 2, "") as string;
+  }
+  set extension(value: string) {
+    pb_1.Message.setField(this, 2, value);
+  }
+  static fromObject(data: {
+    content?: Uint8Array;
+    extension?: string;
+  }): FileData {
     const message = new FileData({});
     if (data.content != null) {
       message.content = data.content;
+    }
+    if (data.extension != null) {
+      message.extension = data.extension;
     }
     return message;
   }
   toObject() {
     const data: {
       content?: Uint8Array;
+      extension?: string;
     } = {};
     if (this.content != null) {
       data.content = this.content;
+    }
+    if (this.extension != null) {
+      data.extension = this.extension;
     }
     return data;
   }
@@ -231,6 +251,7 @@ export class FileData extends pb_1.Message {
   serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
     const writer = w || new pb_1.BinaryWriter();
     if (this.content.length) writer.writeBytes(1, this.content);
+    if (this.extension.length) writer.writeString(2, this.extension);
     if (!w) return writer.getResultBuffer();
   }
   static deserialize(bytes: Uint8Array | pb_1.BinaryReader): FileData {
@@ -244,6 +265,9 @@ export class FileData extends pb_1.Message {
       switch (reader.getFieldNumber()) {
         case 1:
           message.content = reader.readBytes();
+          break;
+        case 2:
+          message.extension = reader.readString();
           break;
         default:
           reader.skipField();

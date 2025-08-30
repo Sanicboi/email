@@ -1,48 +1,35 @@
-import { ServerUnaryCall, sendUnaryData } from "@grpc/grpc-js";
+import { sendUnaryData, ServerUnaryCall } from "@grpc/grpc-js";
 import {
-  DialogueData,
-  FilterValue,
-  FirstMessage,
-  ResponseData,
+  AIMessage,
+  ConversationAnalysis,
+  ConversationData,
+  MessageEvaluation,
   UnimplementedAIService,
   UserData,
   UserMessage,
 } from "../grpc/ai";
-import { FileName, FilesList, FileUploadRequest } from "../grpc/files";
+import { FileData, FileName, FilesList } from "../grpc/files";
+import { writer } from "./agents/Writer";
 import { Empty } from "../grpc/shared";
-import { Model, Prompt } from "../grpc/configuration";
-import {
-  Evaluation,
-  FirstMessageGenerationRequest,
-  InputEvaluationRequest,
-  MessageGenerationResult,
-  OutputEvaluationRequest,
-  ResponseGenerationRequest,
-} from "../grpc/generation";
-import { storage } from "./storage";
-import { config, model } from "./config";
-import {
-  generateFirstMessage,
-  generateHeatMessage,
-  openai,
-  respond,
-} from "./openai";
-import z from "zod";
-import { zodTextFormat } from "openai/helpers/zod";
+import { ModelData } from "../grpc/model";
+import { Agent, AgentType, Prompt } from "../grpc/prompts";
+import { ModelName } from "./openai";
+import { analyzer } from "./agents/Analyzer";
+import { evaluator } from "./agents/Evaluator";
 
 export class AIServiceImpl extends UnimplementedAIService {
   public async getFiles(
     call: ServerUnaryCall<Empty, FilesList>,
     callback: sendUnaryData<FilesList>,
   ): Promise<void> {
-    const files = await storage.getAll();
+    const files = writer.storage.getFiles();
     callback(
       null,
       new FilesList({
         names: files.map(
           (el) =>
             new FileName({
-              name: el.name,
+              name: el,
             }),
         ),
       }),
@@ -50,122 +37,198 @@ export class AIServiceImpl extends UnimplementedAIService {
   }
 
   public async addFile(
-    call: ServerUnaryCall<FileUploadRequest, Empty>,
-    callback: sendUnaryData<Empty>,
+    call: ServerUnaryCall<FileData, FileName>,
+    callback: sendUnaryData<FileName>,
   ): Promise<void> {
-    await storage.add({
-      data: Buffer.from(call.request.content),
-      name: call.request.name,
-    });
-    callback(null, new Empty());
+    try {
+      const name = await writer.storage.addFile(
+        Buffer.from(call.request.content),
+        call.request.extension,
+      );
+      callback(
+        null,
+        new FileName({
+          name,
+        }),
+      );
+    } catch (error) {
+      callback(new Error("File upload error"));
+    }
   }
 
   public async deleteFile(
     call: ServerUnaryCall<FileName, Empty>,
     callback: sendUnaryData<Empty>,
   ): Promise<void> {
-    await storage.deleteFile(call.request.name);
+    await writer.storage.deleteFile(call.request.name);
     callback(null, new Empty());
   }
 
   public async getModel(
-    call: ServerUnaryCall<Empty, Model>,
-    callback: sendUnaryData<Model>,
+    call: ServerUnaryCall<Agent, ModelData>,
+    callback: sendUnaryData<ModelData>,
   ): Promise<void> {
+    let model: ModelName;
+    switch (call.request.agent) {
+      case AgentType.Analyzer:
+        model = analyzer.model;
+        break;
+      case AgentType.Evaluator:
+        model = evaluator.model;
+        break;
+      case AgentType.Writer:
+        model = writer.model;
+        break;
+    }
     callback(
       null,
-      new Model({
-        model: config.model,
+      new ModelData({
+        agent: call.request.agent,
+        name: model,
       }),
     );
   }
 
-  public async editModel(
-    call: ServerUnaryCall<Model, Empty>,
+  public async setModel(
+    call: ServerUnaryCall<ModelData, Empty>,
     callback: sendUnaryData<Empty>,
   ): Promise<void> {
-    await config.setModel(call.request.model as model);
+    switch (call.request.agent) {
+      case AgentType.Writer:
+        writer.model = call.request.name as ModelName;
+        await writer.save();
+        break;
+      case AgentType.Analyzer:
+        analyzer.model = call.request.name as ModelName;
+        await analyzer.save();
+        break;
+      case AgentType.Evaluator:
+        evaluator.model = call.request.name as ModelName;
+        await evaluator.save();
+        break;
+    }
+
     callback(null, new Empty());
   }
 
   public async getPrompt(
-    call: ServerUnaryCall<Empty, Prompt>,
+    call: ServerUnaryCall<Agent, Prompt>,
     callback: sendUnaryData<Prompt>,
   ): Promise<void> {
+    let prompt: string;
+    switch (call.request.agent) {
+      case AgentType.Analyzer:
+        prompt = analyzer.prompt;
+        break;
+      case AgentType.Evaluator:
+        prompt = evaluator.prompt;
+        break;
+      case AgentType.Writer:
+        prompt = writer.prompt;
+        break;
+    }
     callback(
       null,
       new Prompt({
-        prompt: config.prompt,
+        agent: call.request.agent,
+        prompt,
       }),
     );
   }
 
-  public async editPrompt(
+  public async setPrompt(
     call: ServerUnaryCall<Prompt, Empty>,
     callback: sendUnaryData<Empty>,
   ): Promise<void> {
-    await config.setPrompt(call.request.prompt);
-    callback(null, new Empty());
-  }
-
-  public async generateFirstMessage(
-    call: ServerUnaryCall<UserData, FirstMessage>,
-    callback: sendUnaryData<FirstMessage>,
-  ): Promise<void> {
-    try {
-      const res = await generateFirstMessage(call.request.data);
-      callback(null, new FirstMessage(res));
-    } catch (error) {
-      console.error(error);
-      callback(new Error("Unknown error"));
+    switch (call.request.agent) {
+      case AgentType.Writer:
+        writer.prompt = call.request.prompt;
+        await writer.save();
+        break;
+      case AgentType.Analyzer:
+        analyzer.prompt = call.request.prompt;
+        await analyzer.save();
+        break;
+      case AgentType.Evaluator:
+        evaluator.prompt = call.request.prompt;
+        await evaluator.save();
+        break;
     }
   }
 
-  public async generateHeatMessage(
-    call: ServerUnaryCall<DialogueData, FirstMessage>,
-    callback: sendUnaryData<FirstMessage>,
+  public async write(
+    call: ServerUnaryCall<UserData, AIMessage>,
+    callback: sendUnaryData<AIMessage>,
   ): Promise<void> {
     try {
-      const res = await generateHeatMessage(call.request.id);
-      callback(null, new FirstMessage(res));
+      callback(
+        null,
+        await writer.run({
+          type: "write",
+          resId: "",
+          text: call.request.data,
+        }),
+      );
     } catch (error) {
-      callback(new Error("Unknown error"));
+      callback(Error("Error running"));
+    }
+  }
+
+  public async heat(
+    call: ServerUnaryCall<ConversationData, AIMessage>,
+    callback: sendUnaryData<AIMessage>,
+  ): Promise<void> {
+    try {
+      callback(
+        null,
+        await writer.run({
+          type: "heat",
+          resId: call.request.resId,
+          text: "",
+        }),
+      );
+    } catch (error) {
+      callback(Error("Error running"));
     }
   }
 
   public async respond(
-    call: ServerUnaryCall<UserMessage, ResponseData>,
-    callback: sendUnaryData<ResponseData>,
+    call: ServerUnaryCall<UserMessage, AIMessage>,
+    callback: sendUnaryData<AIMessage>,
   ): Promise<void> {
     try {
-      const res = await respond(call.request.text, call.request.id);
-      callback(null, res);
+      callback(
+        null,
+        await writer.run({
+          type: "respond",
+          resId: call.request.resId,
+          text: call.request.text,
+        }),
+      );
     } catch (error) {
-      callback(new Error("Parsing error"));
+      callback(Error("Error running"));
     }
   }
 
-  public async getFilterValue(
-    call: ServerUnaryCall<Empty, FilterValue>,
-    callback: sendUnaryData<FilterValue>,
-  ): Promise<void> {
-    callback(
-      null,
-      new FilterValue({
-        value: config.filter,
-      }),
-    );
-  }
-
-  public async setFilterValue(
-    call: ServerUnaryCall<FilterValue, Empty>,
-    callback: sendUnaryData<Empty>,
+  public async analyze(
+    call: ServerUnaryCall<UserMessage, ConversationAnalysis>,
+    callback: sendUnaryData<ConversationAnalysis>,
   ): Promise<void> {
     try {
-      await config.setFilter(call.request.value);
-      callback(null, new Empty());
+      callback(null, await analyzer.run(call.request));
     } catch (error) {
-      callback(new Error("Invalid filter value"));
+      callback(Error("Error running"));
+    }
+  }
+
+  public async evaluate(
+    call: ServerUnaryCall<ConversationData, MessageEvaluation>,
+    callback: sendUnaryData<MessageEvaluation>,
+  ): Promise<void> {
+    try {
+      callback(null, await evaluator.run(call.request));
+    } catch (error) {
+      callback(Error("Error running"));
     }
   }
 }
