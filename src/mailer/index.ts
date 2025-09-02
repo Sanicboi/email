@@ -23,10 +23,10 @@ db.initialize().then(async () => {
   app.use(express.json());
   app.use(staticRouter);
   app.use("/api", authRouter);
-  app.use("/api/config", devAuth, configRouter);
-  app.use("/api/leads", simpleAuth, leadsRouter);
-  app.use("/api/files", simpleAuth, filesRouter);
-  app.use("/api/mailings", simpleAuth, mailingsRouter);
+  app.use("/api/config", /*devAuth,*/ configRouter);
+  app.use("/api/leads", /*simpleAuth,*/ leadsRouter);
+  app.use("/api/files", /*simpleAuth,*/ filesRouter);
+  app.use("/api/mailings", /*simpleAuth,*/ mailingsRouter);
 
   await email.init();
   await mailer.init();

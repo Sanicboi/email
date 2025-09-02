@@ -10,6 +10,9 @@ router.get("/", async (req, res) => {
     relations: {
       leads: true,
     },
+    order: {
+      createdAt: 'DESC'
+    }
   });
 
   res.status(200).json(mailings);
