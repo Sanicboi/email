@@ -18,7 +18,7 @@ db.initialize().then(async () => {
 
   const logger = pinoHttp();
 
-  app.use(pinoHttp);
+  app.use(logger);
 
   app.use(express.json());
   app.use(staticRouter);
