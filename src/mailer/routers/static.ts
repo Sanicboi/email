@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.use(express.static(path.join(process.cwd(), "dist")));
 
-router.get("*", async (req, res) => {
+router.get("/*splat", async (req, res) => {
   const file = await fs.readFile(
     path.join(process.cwd(), "dist", "index.html"),
     "utf-8",
