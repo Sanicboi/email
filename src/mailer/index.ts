@@ -21,16 +21,18 @@ db.initialize().then(async () => {
   app.use(logger);
 
   app.use(express.json());
-  app.use(staticRouter);
+
   app.use("/api", authRouter);
   app.use("/api/config", /*devAuth,*/ configRouter);
   app.use("/api/leads", /*simpleAuth,*/ leadsRouter);
   app.use("/api/files", /*simpleAuth,*/ filesRouter);
   app.use("/api/mailings", /*simpleAuth,*/ mailingsRouter);
+  app.use(staticRouter);
 
   await email.init();
   await mailer.init();
   cron.schedule("7 13 * * *", async () => await mailer.heat());
+  
 
   app.listen(5000);
 });
