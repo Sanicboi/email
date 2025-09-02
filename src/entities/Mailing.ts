@@ -5,7 +5,6 @@ import {
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { Lead } from "./Lead";
-import { AIMessage } from "./AIResponse";
 
 @Entity()
 export class Mailing {
