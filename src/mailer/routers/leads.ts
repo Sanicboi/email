@@ -52,4 +52,6 @@ router.post(
   },
 );
 
+router.delete('/')
+
 export default router;
