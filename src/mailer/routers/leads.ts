@@ -52,6 +52,8 @@ router.post(
   },
 );
 
-router.delete('/')
+router.delete('/:id', async (req, res) => {
+  
+})
 
 export default router;
