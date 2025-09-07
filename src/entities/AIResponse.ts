@@ -21,6 +21,8 @@ export class AIResponse {
   @CreateDateColumn()
   createdAt: Date;
 
-  @ManyToOne(() => Lead, (lead) => lead.responses)
+  @ManyToOne(() => Lead, (lead) => lead.responses, {
+    onDelete: 'CASCADE'
+  })
   lead: Lead;
 }

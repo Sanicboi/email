@@ -24,6 +24,8 @@ export class LeadMessage {
   @CreateDateColumn()
   createdAt: Date;
 
-  @ManyToOne(() => Lead, (lead) => lead.messages)
+  @ManyToOne(() => Lead, (lead) => lead.messages, {
+    onDelete: 'CASCADE'
+  })
   lead: Lead;
 }

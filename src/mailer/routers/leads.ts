@@ -55,7 +55,7 @@ router.post(
 
 router.delete('/:id', async (req, res) => {
   await manager
-    .createQueryBuilder(User, 'user')
+    .createQueryBuilder(Lead, 'user')
     .delete()
     .where('user.id = :id', {
       id: req.params.id
