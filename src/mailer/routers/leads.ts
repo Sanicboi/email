@@ -1,6 +1,7 @@
 import express from "express";
 import { manager } from "..";
 import { Lead } from "../../entities/Lead";
+import { User } from "../../entities/User";
 
 const router = express.Router();
 
@@ -53,7 +54,14 @@ router.post(
 );
 
 router.delete('/:id', async (req, res) => {
-  
+  await manager
+    .createQueryBuilder(User, 'user')
+    .delete()
+    .where('user.id = :id', {
+      id: req.params.id
+    })
+    .execute();
+  res.status(204).end();
 })
 
 export default router;
