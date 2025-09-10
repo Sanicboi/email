@@ -60,6 +60,7 @@ class EmailClient {
   }
 
   private async poll() {
+    if (!this._imap.usable) await this._imap.connect();
     const lock = await this._imap.getMailboxLock("INBOX");
     try {
       const unseen = await this._imap.search({
@@ -112,6 +113,7 @@ class EmailClient {
   }
 
   private async addMessageToSent(content: string | Buffer) {
+    if (!this._imap.usable) await this._imap.connect();
     await this._imap.append("Sent", content, ["\\Seen"], new Date());
   }
 
@@ -146,6 +148,7 @@ class EmailClient {
       references,
       from: process.env.YANDEX_USER!,
       subject: `Re: ${previousSubject}`,
+      to
     })
       .compile()
       .build();
