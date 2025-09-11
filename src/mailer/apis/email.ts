@@ -36,6 +36,19 @@ class EmailClient {
 
   constructor() {}
 
+  private async reconnect() {
+    this._imap = new ImapFlow({
+    host: "imap.yandex.ru",
+    port: 993,
+    secure: true,
+    auth: {
+      user: process.env.YANDEX_USER!,
+      pass: process.env.YANDEX_PASS,
+    },
+  });
+  await this.connect();
+  }
+
   private async connect(): Promise<void> {
     await this._imap.connect();
   }
@@ -60,7 +73,7 @@ class EmailClient {
   }
 
   private async poll() {
-    if (!this._imap.usable) await this._imap.connect();
+    if (!this._imap.usable) await this.reconnect();
     const lock = await this._imap.getMailboxLock("INBOX");
     try {
       const unseen = await this._imap.search({
@@ -113,7 +126,7 @@ class EmailClient {
   }
 
   private async addMessageToSent(content: string | Buffer) {
-    if (!this._imap.usable) await this._imap.connect();
+    if (!this._imap.usable) await this.reconnect();
     await this._imap.append("Sent", content, ["\\Seen"], new Date());
   }
 
