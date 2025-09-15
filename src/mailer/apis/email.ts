@@ -76,6 +76,7 @@ class EmailClient {
   private async poll() {
     if (!this._imap.usable) await this.reconnect();
     const lock = await this._imap.getMailboxLock("INBOX");
+    await this._imap.mailboxOpen("INBOX");
     try {
       const unseen = await this._imap.search({
         seen: false,
@@ -121,6 +122,7 @@ class EmailClient {
         } finally {
           await this._imap.messageFlagsAdd(message, ["\\Seen"]);
         }
+
       }
     } catch (error) {
       logger.error(error, "Error fetching messages");
