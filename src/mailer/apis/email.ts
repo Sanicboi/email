@@ -32,11 +32,12 @@ class EmailClient {
     text: string,
     message: FetchMessageObject,
   ) => Promise<void> = async () => {};
-  private _cronExpr: string = "* * * * *";
+  private _cronExpr: string = "*/2 * * * *";
 
   constructor() {}
 
   private async reconnect() {
+    this._imap.close();
     this._imap = new ImapFlow({
     host: "imap.yandex.ru",
     port: 993,
