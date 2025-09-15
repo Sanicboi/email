@@ -80,6 +80,7 @@ class EmailClient {
         seen: false,
         deleted: false,
       });
+      logger.info(unseen, 'Unseen messages');
       if (!unseen) throw new Error("No unseen messages");
 
       const messages = await this._imap.fetchAll(unseen, {

@@ -104,6 +104,7 @@ class Mailer {
     text: string,
     message: FetchMessageObject,
   ): Promise<void> {
+    logger.info('Called respond')
     if (
       lead.status === LeadStatus.Delayed &&
       dayjs(lead.delayDate).isBefore(new Date())
