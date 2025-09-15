@@ -37,17 +37,17 @@ class EmailClient {
   constructor() {}
 
   private async reconnect() {
-    this._imap.close();
-    this._imap = new ImapFlow({
-    host: "imap.yandex.ru",
-    port: 993,
-    secure: true,
-    auth: {
-      user: process.env.YANDEX_USER!,
-      pass: process.env.YANDEX_PASS,
-    },
-  });
-  await this.connect();
+  //   this._imap.close();
+  //   this._imap = new ImapFlow({
+  //   host: "imap.yandex.ru",
+  //   port: 993,
+  //   secure: true,
+  //   auth: {
+  //     user: process.env.YANDEX_USER!,
+  //     pass: process.env.YANDEX_PASS,
+  //   },
+  // });
+  // await this.connect();
   }
 
   private async connect(): Promise<void> {
