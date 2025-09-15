@@ -11,6 +11,7 @@ import dayjs from "dayjs";
 import { LeadMessage } from "../../entities/LeadMessage";
 import fs from "fs/promises";
 import path from "path";
+import { simpleParser } from "mailparser";
 
 class Mailer {
   private _subject: string = "";
@@ -152,8 +153,8 @@ class Mailer {
         }),
       );
 
-      //@ts-ignore
-      const references: string | null = message.headers!.get("references");
+      const body = await simpleParser(message.source!.toString("utf-8"));
+      const references: string | null = body.headers.get('references')?.toString() ?? null;
 
       const evaluation = await client.evaluate(
         new ConversationData({

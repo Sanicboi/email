@@ -154,6 +154,7 @@ export class AIServiceImpl extends UnimplementedAIService {
         await evaluator.save();
         break;
     }
+    callback(null, new Empty())
   }
 
   public async write(
