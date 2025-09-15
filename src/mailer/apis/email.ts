@@ -125,12 +125,13 @@ class EmailClient {
     } catch (error) {
       logger.error(error, "Error fetching messages");
     } finally {
+      logger.info('Releasing the lock')
       lock.release();
     }
   }
 
-  private async addMessageToSent(content: string | Buffer) {
-    if (!this._imap.usable) await this.reconnect();
+  private async addMessageToSent(content: string | Buffer, dnr: boolean) {
+    if (!this._imap.usable && !dnr) await this.reconnect();
     await this._imap.append("Sent", content, ["\\Seen"], new Date());
   }
 
@@ -149,7 +150,7 @@ class EmailClient {
       subject,
       from: process.env.YANDEX_USER!,
     });
-    await this.addMessageToSent(message);
+    await this.addMessageToSent(message, false);
   }
 
   public async respond(
@@ -177,7 +178,7 @@ class EmailClient {
       subject: `Re: ${previousSubject}`,
     });
 
-    await this.addMessageToSent(message);
+    await this.addMessageToSent(message, true);
   }
 }
 
