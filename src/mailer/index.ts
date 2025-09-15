@@ -31,6 +31,7 @@ db.initialize().then(async () => {
 
   await email.init();
   await mailer.init();
+  email.onNewMessage(async (lead, text, obj) => await mailer.respond(lead, text, obj))
   cron.schedule("7 13 * * *", async () => await mailer.heat());
   
 

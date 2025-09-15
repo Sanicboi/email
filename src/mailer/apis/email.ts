@@ -32,7 +32,7 @@ class EmailClient {
     text: string,
     message: FetchMessageObject,
   ) => Promise<void> = async () => {};
-  private _cronExpr: string = "*/5 * * * *";
+  private _cronExpr: string = "* * * * *";
 
   constructor() {}
 
@@ -88,6 +88,8 @@ class EmailClient {
         uid: true,
         headers: true,
       });
+
+      logger.info(messages, 'messages fetched')
 
       for (const message of messages) {
         try {
